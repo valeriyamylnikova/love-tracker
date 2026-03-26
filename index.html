@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0f0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Любовный Трекер</title>
+<title>Система отношений</title>
 <style>
 /* ── ЛОКАЛЬНЫЕ ШРИФТЫ — без Google Fonts ──────────────
    Playfair Display → Georgia / 'Didact Gothic' / serif
@@ -268,8 +268,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- SPLASH -->
 <div id="ss" class="screen active">
   <div class="sh">❤️</div>
-  <div class="st">Любовный Трекер</div>
-  <div class="ss">Для настоящих мужчин</div>
+  <div class="st">Система отношений</div>
+  <div class="ss">Ты просто делаешь — и она это чувствует</div>
 </div>
 
 <!-- AUTH -->
@@ -293,40 +293,40 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- WIFE APP -->
 <div id="sw" class="screen">
   <div class="topbar">
-    <div class="topbar-title">❤️ Любовный Трекер</div>
+    <div class="topbar-title">❤️ Как он старается ❤️</div>
     <div class="topbar-right">
       <span id="w-code-top" style="font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:700"></span>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
   </div>
   <div style="display:flex;border-bottom:1px solid var(--border);background:var(--bg2)">
-    <button class="tbb active" onclick="wTab('progress')" id="wt-progress"><span class="ti">📊</span>Прогресс</button>
+    <button class="tbb active" onclick="wTab('progress')" id="wt-progress"><span class="ti">📊</span>Результат</button>
     <button class="tbb" onclick="wTab('today')" id="wt-today"><span class="ti">🌸</span>Сегодня</button>
-    <button class="tbb" onclick="wTab('reminders')" id="wt-reminders"><span class="ti">📝</span>Задания</button>
+    <button class="tbb" onclick="wTab('reminders')" id="wt-reminders"><span class="ti">📝</span>Пожелание</button>
     <button class="tbb" onclick="wTab('quiz')" id="wt-quiz"><span class="ti">💕</span>Тест</button>
   </div>
   <div class="content">
 
     <!-- PROGRESS TAB -->
     <div class="tpanel active" id="wp-progress">
-      <div style="margin-bottom:20px"><div class="sec-title">Прогресс мужа</div><div class="sec-sub">Как он справляется ❤️</div></div>
+      <div style="margin-bottom:20px"><div class="sec-title">Как он старается для тебя</div><div class="sec-sub">Его действия сегодня ❤️</div></div>
       <div id="w-no-couple" style="text-align:center;padding:40px 0;display:none">
         <div style="font-size:50px;margin-bottom:12px">🔗</div>
-        <div class="sec-title" style="font-size:18px">Муж ещё не подключился</div>
-        <div class="sec-sub">Отправьте ему этот код</div>
+        <div class="sec-title" style="font-size:18px">Он ещё не присоединился</div>
+        <div class="sec-sub">Отправьте код — и он начнёт делать для вас</div>
         <div class="code-disp" id="w-code-big"></div>
       </div>
       <div id="w-progress-content">
         <div class="card">
-          <div class="prow"><span class="ptitle">Очки отношений</span><span class="pval" id="w-pts">0</span></div>
+          <div class="prow"><span class="ptitle">Влияние на отношения</span><span class="pval" id="w-pts">0</span></div>
           <div class="pbar-wrap"><div class="pbar-fill" id="w-pts-bar" style="width:0%"></div></div>
           <div class="pgrid">
-            <div class="pstat"><div class="pnum" id="w-streak">0</div><div class="plbl">Серия дней</div></div>
-            <div class="pstat"><div class="pnum" id="w-today">0/3</div><div class="plbl">Сегодня</div></div>
-            <div class="pstat"><div class="pnum" id="w-total">0</div><div class="plbl">Всего</div></div>
+            <div class="pstat"><div class="pnum" id="w-streak">0</div><div class="plbl">Дней подряд</div></div>
+            <div class="pstat"><div class="pnum" id="w-today">0/3</div><div class="plbl">Сделано сегодня</div></div>
+            <div class="pstat"><div class="pnum" id="w-total">0</div><div class="plbl">Всего действий</div></div>
           </div>
         </div>
-        <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Сегодня муж:</div></div>
+        <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Сегодня он сделал для тебя:</div></div>
         <div class="card" id="w-feed"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Загружаем...</div></div>
       </div>
     </div>
@@ -344,21 +344,21 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <button class="chip" data-lang="touch" onclick="pickLang(this)">🤗 Прикосновения</button>
         </div>
         <div class="fg" style="margin-top:14px">
-          <label class="fl">Пожелание на сегодня (необязательно)</label>
-          <textarea class="fi" id="wife-wish-text" rows="2" placeholder="Например: хочу чтобы ты сегодня обнял меня и сказал что любишь..." style="resize:none;height:60px"></textarea>
+          <label class="fl">Что сделает тебя счастливее сегодня?</label>
+          <textarea class="fi" id="wife-wish-text" rows="2" placeholder="Например: внимание, помощь, забота, разговор..." style="resize:none;height:60px"></textarea>
         </div>
-        <button class="bsec" style="margin-top:14px;width:100%" onclick="saveMorning()">Отправить пожелание</button>
-        <div id="morning-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Пожелание уже отправлено сегодня</div>
+        <button class="bsec" style="margin-top:14px;width:100%" onclick="saveMorning()">Сохранить</button>
+        <div id="morning-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Пожелание отправлено</div>
       </div>
       <div class="card" id="ev-card">
-        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">🌙 Как прошёл день с мужем?</div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Только позитив — ваш муж старается</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">🌙 Ты почувствовала разницу сегодня?</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Он старается — твоя оценка даёт ему энергию</div>
         <div class="fb-opts">
           <div class="fb-opt" data-v="normal" onclick="pickFb(this)"><span class="fb-em">😊</span><div class="fb-tx">Нормально</div><div class="fb-pt">+0 очков</div></div>
           <div class="fb-opt" data-v="cute" onclick="pickFb(this)"><span class="fb-em">🥰</span><div class="fb-tx">Мило</div><div class="fb-pt">+1 очко</div></div>
           <div class="fb-opt" data-v="great" onclick="pickFb(this)"><span class="fb-em">😍</span><div class="fb-tx">Очень приятно</div><div class="fb-pt">+3 очка</div></div>
         </div>
-        <button class="bp" style="margin-top:14px" onclick="submitFb()">Отправить оценку</button>
+        <button class="bp" style="margin-top:14px" onclick="submitFb()">Отправить</button>
         <div id="fb-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Оценка за сегодня уже отправлена</div>
       </div>
     </div>
@@ -366,26 +366,26 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <!-- REMINDERS TAB — одно персональное задание на день -->
     <div class="tpanel" id="wp-reminders">
       <div style="margin-bottom:20px">
-        <div class="sec-title">Личное задание мужу</div>
-        <div class="sec-sub">Одно пожелание — ИИ обязательно включит его в список</div>
+        <div class="sec-title">Твоё личное пожелание</div>
+        <div class="sec-sub">Он получит его первым — ИИ встроит в его день</div>
       </div>
       <div class="card" style="background:linear-gradient(135deg,#1a1030,#0f0a20);border-color:rgba(160,96,232,.3)">
         <div style="font-size:12px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">✍️ Что ты хочешь от мужа сегодня?</div>
         <textarea class="fi" id="rem-single-input" rows="3" placeholder="Например: Обними меня крепко когда придёшь домой и скажи что соскучился" style="resize:none;height:80px"></textarea>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5">ИИ сохранит смысл твоего пожелания и включит его первым заданием для мужа.</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5">Он получит это как первое действие — и сделает именно для тебя.</div>
       </div>
-      <button class="bp" onclick="saveRemSingle()" style="margin-top:4px">Сохранить пожелание</button>
-      <div id="rem-saved-msg" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:12px;text-align:center">✅ Пожелание сохранено!</div>
+      <button class="bp" onclick="saveRemSingle()" style="margin-top:4px">Отправить мужу</button>
+      <div id="rem-saved-msg" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:12px;text-align:center">✅ Он получит это сегодня!</div>
     </div>
 
     <!-- QUIZ TAB -->
     <div class="tpanel" id="wp-quiz">
       <div id="quiz-intro">
-        <div class="sec-title">Тест: 5 языков любви</div>
-        <div class="sec-sub">20 вопросов — узнай свой язык любви</div>
+        <div class="sec-title">Что делает тебя счастливой?</div>
+        <div class="sec-sub">20 вопросов — и муж будет знать, что именно тебе важно</div>
         <div class="card" style="text-align:center;padding:28px">
           <div style="font-size:48px;margin-bottom:16px">💕</div>
-          <div style="font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:20px">Этот тест поможет понять, что именно делает тебя счастливой — а муж будет получать задания именно под твой язык любви.</div>
+          <div style="font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:20px">Пройди тест — и он перестанет гадать. Его действия станут точными.</div>
           <button class="bp" onclick="startQuiz()">Начать тест</button>
           <div id="quiz-prev-result" style="margin-top:16px;display:none"></div>
         </div>
@@ -399,11 +399,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       </div>
       <div id="quiz-result-block" style="display:none">
         <div class="quiz-result">
-          <div class="qr-title">Твой профиль любви</div>
+          <div class="qr-title">Вот что тебе важно</div>
           <div class="lang-bars" id="lang-bars"></div>
           <div class="qr-main" id="qr-main"></div>
           <div class="qr-desc" id="qr-desc"></div>
-          <button class="bp" onclick="saveQuizResult()">Сохранить и применить к заданиям</button>
+          <button class="bp" onclick="saveQuizResult()">Применить — пусть знает</button>
         </div>
       </div>
     </div>
@@ -414,7 +414,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- HUSBAND APP -->
 <div id="sh" class="screen">
   <div class="topbar">
-    <div class="topbar-title">💪 Твои Задания</div>
+    <div class="topbar-title">💪 Сегодня ты делаешь лучше</div>
     <div class="topbar-right">
       <div class="pts-widget"><span>⭐</span><div class="pts-num" id="h-pts-top">0</div></div>
       <button class="bic" id="remote-toggle" onclick="toggleRemoteMode()" title="Режим на расстоянии" style="font-size:18px">🏠</button>
@@ -423,60 +423,60 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
   <div class="tabs">
     <button class="tbb active" onclick="hTab('today')" id="ht-today"><span class="ti">📋</span>Сегодня</button>
-    <button class="tbb" onclick="hTab('streak')" id="ht-streak"><span class="ti">🔥</span>Серия</button>
-    <button class="tbb" onclick="hTab('rewards')" id="ht-rewards"><span class="ti">🏆</span>Награды</button>
+    <button class="tbb" onclick="hTab('streak')" id="ht-streak"><span class="ti">🔥</span>Темп</button>
+    <button class="tbb" onclick="hTab('rewards')" id="ht-rewards"><span class="ti">🏆</span>Рост</button>
   </div>
   <div class="content">
     <div class="tpanel active" id="hp-today">
       <div class="dh">
-        <div class="dg" id="h-greet">Привет!</div>
+        <div class="dg" id="h-greet">Время действовать</div>
         <div class="ds"><span class="sn" id="h-st">0</span><span style="font-size:12px;color:var(--text3)">🔥</span></div>
       </div>
       <!-- Current title badge -->
       <div class="cur-title-card" id="h-title-card" style="display:none">
         <div class="cur-title-avatar" id="h-title-avatar">🧑</div>
         <div class="cur-title-info">
-          <div class="cur-title-lbl">Твоё звание</div>
-          <div class="cur-title-name" id="h-title-name">Начинающий романтик</div>
+          <div class="cur-title-lbl">Твой уровень</div>
+          <div class="cur-title-name" id="h-title-name">Начинающий</div>
         </div>
       </div>
       <!-- Wife wishes banner -->
       <div class="wife-wishes-banner" id="wife-wishes-banner">
-        <div class="wwb-title">💜 Жена оставила пожелание</div>
+        <div class="wwb-title">💜 Она хочет от тебя кое-что</div>
         <div class="wwb-body" id="wwb-body">Загружаем...</div>
       </div>
       <!-- Remote mode banner -->
       <div id="remote-mode-banner" style="display:none;background:linear-gradient(135deg,#0a1a2a,#0a1020);border:1px solid rgba(96,168,232,.4);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px">
-        <div style="font-size:12px;color:var(--blue);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">✈️ Режим: Я не рядом</div>
-        <div style="font-size:13px;color:var(--text2)">Задания адаптированы для общения на расстоянии</div>
+        <div style="font-size:12px;color:var(--blue);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">✈️ Режим: На расстоянии</div>
+        <div style="font-size:13px;color:var(--text2)">Действия адаптированы — влияние то же</div>
       </div>
       <!-- AI generating indicator -->
       <div class="ai-gen-card" id="ai-gen-card">
         <div class="ai-pulse">
           <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
-          <span style="font-size:13px;font-weight:600;margin-left:4px">ИИ подбирает задания...</span>
+          <span style="font-size:13px;font-weight:600;margin-left:4px">Подбираем что сработает...</span>
         </div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px">С учётом языков любви и пожеланий жены</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px">На основе того, что важно именно ей</div>
       </div>
       <div id="tasks-list"></div>
       <div id="all-done-banner" style="display:none" class="all-done-banner">
         <span class="adb-big">🏆</span>
-        <p style="color:var(--green);font-weight:600;font-size:16px">Все задания выполнены!</p>
-        <p style="color:var(--text3);font-size:13px;margin-top:6px">Ты настоящий мужчина. Так держать!</p>
+        <p style="color:var(--green);font-weight:600;font-size:16px">Ты сделал больше, чем 80% мужчин</p>
+        <p style="color:var(--text3);font-size:13px;margin-top:6px">Продолжай — и она это почувствует</p>
       </div>
     </div>
     <div class="tpanel" id="hp-streak">
-      <div class="sec-title">Твоя серия</div>
-      <div class="sec-sub">Каждый день — шаг к награде</div>
+      <div class="sec-title">Ты держишь темп</div>
+      <div class="sec-sub">Вот так и строятся нормальные отношения</div>
       <div class="card">
-        <div class="prow"><span class="ptitle">Серия дней</span><span class="pval" id="h-st-days">0 дней</span></div>
+        <div class="prow"><span class="ptitle">Дней подряд</span><span class="pval" id="h-st-days">0 дней</span></div>
         <div class="pbar-wrap"><div class="pbar-fill" id="h-st-bar" style="width:0%"></div></div>
       </div>
       <div class="sgrid" id="sgrid"></div>
     </div>
     <div class="tpanel" id="hp-rewards">
-      <div class="sec-title">Заслуженные награды</div>
-      <div class="sec-sub">Виртуальные аватарки и звания за серию дней</div>
+      <div class="sec-title">Ты не просто стараешься — ты растёшь</div>
+      <div class="sec-sub">Такие вещи реально меняют отношения</div>
       <div id="rewards-list"></div>
     </div>
   </div>
@@ -632,7 +632,7 @@ const REWARDS = [
   {
     days: 1, type: 'title',
     icon: '💫', avatar: '🧑',
-    name: 'Начинающий романтик',
+    name: 'Начинающий',
     desc: 'Первый шаг сделан — уже не все на это способны.',
     badgeClass: 'gold'
   },
@@ -653,7 +653,7 @@ const REWARDS = [
   {
     days: 7, type: 'title',
     icon: '💪', avatar: '🤴',
-    name: 'Монстр романтики',
+    name: 'Уже влияет',
     desc: 'Ты не просто стараешься — ты делаешь это системно.',
     badgeClass: 'purple'
   },
@@ -709,7 +709,7 @@ const REWARDS = [
   {
     days: 365, type: 'title',
     icon: '♾️', avatar: '🦅',
-    name: 'Вечный романтик',
+    name: 'Она это чувствует',
     desc: 'Год без пропусков. Ты — редкость в этом мире.',
     badgeClass: 'purple'
   },
@@ -1264,7 +1264,7 @@ function toggleMode(){
   authMode=authMode==='login'?'register':'login';
   const r=authMode==='register';
   document.getElementById('auth-title').textContent=r?'Регистрация':'Войти';
-  document.getElementById('auth-sub').textContent=r?'Создайте аккаунт':'Введите свои данные';
+  document.getElementById('auth-sub').textContent=r?'Начните прямо сейчас':'Введите свои данные';
   document.getElementById('tog-txt').textContent=r?'Уже есть аккаунт?':'Нет аккаунта?';
   document.getElementById('tog-lnk').textContent=r?'Войти':'Зарегистрироваться';
   document.getElementById('auth-btn').textContent=r?'Зарегистрироваться':'Войти';
@@ -1284,7 +1284,7 @@ async function doAuth(){
   try{
     if(authMode==='login'){
       const user=await pb.signIn(email,pass);
-      CU=user;btn.textContent='Загружаем профиль...';
+      CU=user;btn.textContent='Загружаем...';
       await loadProfile();
     } else {
       const code=document.getElementById('ai-code').value.trim().toUpperCase();
@@ -1319,7 +1319,7 @@ async function createProfile(role,code){
 }
 
 async function loadProfile(){
-  loading(true,'Загружаем профиль...');
+  loading(true,'Загружаем...');
   try{
     const {data:p,error:pe}=await pb.getOne('profiles',`user_id="${CU.id}"`);
     if(pe||!p) throw new Error(pe?.message||'Профиль не найден. Зарегистрируйтесь.');
@@ -1516,7 +1516,7 @@ async function saveRemSingle(){
   loading(false);
   const msg=document.getElementById('rem-saved-msg');
   if(msg){msg.style.display='block';setTimeout(()=>msg.style.display='none',3000);}
-  toast('✅ Пожелание сохранено! Муж получит его в заданиях.');
+  toast('✅ Он получит это сегодня! Муж получит его в заданиях.');
 }
 
 // ── QUIZ ───────────────────────────────────────────────
@@ -1662,7 +1662,7 @@ function loadTodayTasksLocally() {
 }
 
 async function loadHusbandData(){
-  loading(true,'Загружаем задания...');
+  loading(true,'Подбираем что сработает...');
   const today=getLocalDateStr();
 
   // Все запросы параллельно — вместо 5 последовательных запросов
@@ -1815,7 +1815,7 @@ function renderTasks(){
       <div class="tcat">${CAT_LABELS[t.category]||'📋 Задание'}</div>
       <div class="ttxt">${t.t}</div>
       <div class="tmot">${t.m}</div>
-      <button class="bdone" onclick="completeTask(${i})">Сделано ✓</button>
+      <button class="bdone" onclick="completeTask(${i})">Сделано</button>
     </div>`;
   }).join('');
 
@@ -1854,9 +1854,9 @@ async function completeTask(i){
   setTimeout(()=>{
     renderTasks();
     launchConfetti(28);
-    toast('💪 Выполнено! +2 очка');
+    toast('💪 Сделал — она это почувствует');
     if(hTasks.every(t=>t.done)){
-      setTimeout(()=>{launchConfetti(70);toast('🏆 Все задания! Ты легенда!')},600);
+      setTimeout(()=>{launchConfetti(70);toast('🏆 Ты сделал больше, чем 80% мужчин!')},600);
     }
     // Start cooldown countdown to re-render when unlocked
     if(!hTasks.every(t=>t.done)){
@@ -2000,8 +2000,8 @@ function renderRewards(){
     html += `<div class="card card-gold" style="text-align:center;padding:24px;margin-bottom:20px">
       <div style="font-size:56px;margin-bottom:8px">${av}</div>
       <div style="font-size:12px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Твой текущий статус</div>
-      <div class="cur-title-name" style="font-size:20px;margin-bottom:4px">${curTitle?.name||'Начинающий романтик'}</div>
-      <div style="font-size:13px;color:var(--text3)">Серия: ${hStreak} дней 🔥</div>
+      <div class="cur-title-name" style="font-size:20px;margin-bottom:4px">${curTitle?.name||'Начинающий'}</div>
+      <div style="font-size:13px;color:var(--text3)">Ты держишь темп: ${hStreak} дней 🔥</div>
     </div>`;
   }
 
@@ -2080,7 +2080,7 @@ function scheduleNotifs(){
     const t=new Date(now);t.setHours(s.h,0,0,0);
     if(t<=now) t.setDate(t.getDate()+1);
     setTimeout(function fire(){
-      if(Notification.permission==='granted') new Notification('Любовный Трекер',{body:s.txt});
+      if(Notification.permission==='granted') new Notification('Сегодня ты делаешь лучше',{body:s.txt});
       setTimeout(fire,86400000);
     },t-now);
   });
