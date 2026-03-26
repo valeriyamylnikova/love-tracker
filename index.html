@@ -511,7 +511,19 @@ const pb = {
       body: JSON.stringify({email, password, passwordConfirm: password, emailVisibility: true})
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.message || 'Ошибка регистрации');
+    if (!r.ok) {
+      // Parse PocketBase validation errors into human-readable Russian messages
+      if (d.data) {
+        const errs = d.data;
+        if (errs.password?.code === 'validation_length_out_of_range' || errs.password?.message)
+          throw new Error('Пароль слишком короткий — минимум 8 символов');
+        if (errs.email?.code === 'validation_invalid_email' || errs.email?.message)
+          throw new Error('Введите корректный email адрес');
+      }
+      if (d.message?.toLowerCase().includes('already exists') || d.message?.toLowerCase().includes('unique'))
+        throw new Error('Этот email уже зарегистрирован — попробуйте войти');
+      throw new Error(d.message || 'Ошибка регистрации');
+    }
     // Auto sign in after register
     return await this.signIn(email, password);
   },
@@ -1265,6 +1277,7 @@ async function doAuth(){
   const email=document.getElementById('ai-email').value.trim();
   const pass=document.getElementById('ai-pass').value.trim();
   if(!email||!pass){showErr('Заполните email и пароль');return}
+  if(authMode==='register'&&pass.length<8){showErr('Пароль должен быть минимум 8 символов');return}
   const btn=document.getElementById('auth-btn');
   btn.disabled=true;btn.textContent=authMode==='login'?'Входим...':'Создаём аккаунт...';
   document.getElementById('auth-err').classList.remove('show');
