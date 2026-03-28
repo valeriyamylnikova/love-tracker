@@ -269,7 +269,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div id="ss" class="screen active">
   <div class="sh">❤️</div>
   <div class="st">Система отношений</div>
-  <div class="ss">Ты просто делаешь — и она это чувствует</div>
+  <div class="ss">Ты просто делишься — он начинает понимать</div>
 </div>
 
 <!-- AUTH -->
@@ -302,18 +302,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div style="display:flex;border-bottom:1px solid var(--border);background:var(--bg2)">
     <button class="tbb active" onclick="wTab('progress')" id="wt-progress"><span class="ti">📊</span>Результат</button>
     <button class="tbb" onclick="wTab('today')" id="wt-today"><span class="ti">🌸</span>Сегодня</button>
-    <button class="tbb" onclick="wTab('reminders')" id="wt-reminders"><span class="ti">📝</span>Пожелание</button>
     <button class="tbb" onclick="wTab('quiz')" id="wt-quiz"><span class="ti">💕</span>Тест</button>
   </div>
   <div class="content">
 
     <!-- PROGRESS TAB -->
     <div class="tpanel active" id="wp-progress">
-      <div style="margin-bottom:20px"><div class="sec-title">Как он старается для тебя</div><div class="sec-sub">Его действия сегодня ❤️</div></div>
+      <div style="margin-bottom:20px"><div class="sec-title">Как он заботится сегодня</div><div class="sec-sub">Его действия влияют на ваши отношения ❤️</div></div>
       <div id="w-no-couple" style="text-align:center;padding:40px 0;display:none">
         <div style="font-size:50px;margin-bottom:12px">🔗</div>
         <div class="sec-title" style="font-size:18px">Он ещё не присоединился</div>
-        <div class="sec-sub">Отправьте код — и он начнёт делать для вас</div>
+        <div class="sec-sub">Отправьте ему код — и он начнёт лучше тебя понимать</div>
         <div class="code-disp" id="w-code-big"></div>
       </div>
       <div id="w-progress-content">
@@ -326,7 +325,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
             <div class="pstat"><div class="pnum" id="w-total">0</div><div class="plbl">Всего действий</div></div>
           </div>
         </div>
-        <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Сегодня он сделал для тебя:</div></div>
+        <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Сегодня он выбрал позаботиться:</div></div>
         <div class="card" id="w-feed"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Загружаем...</div></div>
       </div>
     </div>
@@ -334,8 +333,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <!-- TODAY TAB -->
     <div class="tpanel" id="wp-today">
       <div class="card" style="background:linear-gradient(135deg,#2a1515,#1e1010);border-color:var(--border);margin-bottom:16px">
-        <div style="font-size:12px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">☀️ Утренний запрос</div>
-        <div style="font-size:14px;color:var(--text2);margin-bottom:14px">Какой язык любви тебе сегодня важнее всего?</div>
+        <div style="font-size:12px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">☀️ Что важно для тебя сегодня?</div>
+        <div style="font-size:14px;color:var(--text2);margin-bottom:14px">Отметь язык любви, который сейчас откликается больше всего</div>
         <div class="chips" id="lang-chips">
           <button class="chip" data-lang="words" onclick="pickLang(this)">💬 Слова</button>
           <button class="chip" data-lang="time" onclick="pickLang(this)">⏰ Время</button>
@@ -344,18 +343,27 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <button class="chip" data-lang="touch" onclick="pickLang(this)">🤗 Прикосновения</button>
         </div>
         <div class="fg" style="margin-top:14px">
-          <label class="fl">Что сделает тебя счастливее сегодня?</label>
-          <textarea class="fi" id="wife-wish-text" rows="2" placeholder="Например: внимание, помощь, забота, разговор..." style="resize:none;height:60px"></textarea>
+          <label class="fl">Чего тебе сейчас не хватает?</label>
+          <textarea class="fi" id="wife-wish-text" rows="2" placeholder="Внимание, тепло, поддержка, разговор..." style="resize:none;height:60px"></textarea>
         </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">Ты просто делишься тем, что для тебя важно — мы учтём это при подборе действий</div>
         <button class="bsec" style="margin-top:14px;width:100%" onclick="saveMorning()">Сохранить</button>
-        <div id="morning-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Пожелание отправлено</div>
+        <div id="morning-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Состояние сохранено</div>
+      </div>
+      <!-- Личное пожелание (встроено в Сегодня) -->
+      <div class="card" id="wish-card" style="background:linear-gradient(135deg,#1a1030,#0f0a20);border-color:rgba(160,96,232,.3);display:none">
+        <div style="font-size:12px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">✨ Что сейчас было бы для тебя особенно приятно?</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5">Без указаний. Без давления. Просто поделись — мы поможем партнёру лучше тебя понять</div>
+        <textarea class="fi" id="rem-single-input" rows="3" placeholder="Например: Хочется, чтобы меня обняли когда придут домой..." style="resize:none;height:80px"></textarea>
+        <button class="bp" onclick="saveRemSingle()" style="margin-top:12px">Сохранить</button>
+        <div id="rem-saved-msg" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:12px;text-align:center">✅ Учтём сегодня!</div>
       </div>
       <div class="card" id="ev-card">
-        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">🌙 Ты почувствовала разницу сегодня?</div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Он старается — твоя оценка даёт ему энергию</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">🌙 Кажется, сегодня что-то изменилось?</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Твой ответ помогает нам лучше понимать, что действительно работает</div>
         <div class="fb-opts">
           <div class="fb-opt" data-v="normal" onclick="pickFb(this)"><span class="fb-em">😊</span><div class="fb-tx">Нормально</div><div class="fb-pt">+0 очков</div></div>
-          <div class="fb-opt" data-v="cute" onclick="pickFb(this)"><span class="fb-em">🥰</span><div class="fb-tx">Мило</div><div class="fb-pt">+1 очко</div></div>
+          <div class="fb-opt" data-v="cute" onclick="pickFb(this)"><span class="fb-em">🥰</span><div class="fb-tx">Стало лучше</div><div class="fb-pt">+1 очко</div></div>
           <div class="fb-opt" data-v="great" onclick="pickFb(this)"><span class="fb-em">😍</span><div class="fb-tx">Очень приятно</div><div class="fb-pt">+3 очка</div></div>
         </div>
         <button class="bp" style="margin-top:14px" onclick="submitFb()">Отправить</button>
@@ -363,29 +371,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       </div>
     </div>
 
-    <!-- REMINDERS TAB — одно персональное задание на день -->
-    <div class="tpanel" id="wp-reminders">
-      <div style="margin-bottom:20px">
-        <div class="sec-title">Твоё личное пожелание</div>
-        <div class="sec-sub">Он получит его первым — ИИ встроит в его день</div>
-      </div>
-      <div class="card" style="background:linear-gradient(135deg,#1a1030,#0f0a20);border-color:rgba(160,96,232,.3)">
-        <div style="font-size:12px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">✍️ Что ты хочешь от мужа сегодня?</div>
-        <textarea class="fi" id="rem-single-input" rows="3" placeholder="Например: Обними меня крепко когда придёшь домой и скажи что соскучился" style="resize:none;height:80px"></textarea>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5">Он получит это как первое действие — и сделает именно для тебя.</div>
-      </div>
-      <button class="bp" onclick="saveRemSingle()" style="margin-top:4px">Отправить мужу</button>
-      <div id="rem-saved-msg" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:12px;text-align:center">✅ Он получит это сегодня!</div>
-    </div>
-
     <!-- QUIZ TAB -->
     <div class="tpanel" id="wp-quiz">
       <div id="quiz-intro">
-        <div class="sec-title">Что делает тебя счастливой?</div>
-        <div class="sec-sub">20 вопросов — и муж будет знать, что именно тебе важно</div>
+        <div class="sec-title">Что для тебя по-настоящему важно?</div>
+        <div class="sec-sub">Ответь на несколько вопросов — и мы поможем партнёру лучше тебя понимать</div>
         <div class="card" style="text-align:center;padding:28px">
           <div style="font-size:48px;margin-bottom:16px">💕</div>
-          <div style="font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:20px">Пройди тест — и он перестанет гадать. Его действия станут точными.</div>
+          <div style="font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:20px">Ответь честно — без правильных ответов. Это поможет нам подобрать действия, которые действительно резонируют с тобой.</div>
           <button class="bp" onclick="startQuiz()">Начать тест</button>
           <div id="quiz-prev-result" style="margin-top:16px;display:none"></div>
         </div>
@@ -403,7 +396,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div class="lang-bars" id="lang-bars"></div>
           <div class="qr-main" id="qr-main"></div>
           <div class="qr-desc" id="qr-desc"></div>
-          <button class="bp" onclick="saveQuizResult()">Применить — пусть знает</button>
+          <button class="bp" onclick="saveQuizResult()">Применить — пусть лучше понимает</button>
         </div>
       </div>
     </div>
@@ -414,7 +407,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- HUSBAND APP -->
 <div id="sh" class="screen">
   <div class="topbar">
-    <div class="topbar-title">💪 Сегодня ты делаешь лучше</div>
+    <div class="topbar-title">💪 Сегодня есть возможность стать лучше</div>
     <div class="topbar-right">
       <div class="pts-widget"><span>⭐</span><div class="pts-num" id="h-pts-top">0</div></div>
       <button class="bic" id="remote-toggle" onclick="toggleRemoteMode()" title="Режим на расстоянии" style="font-size:18px">🏠</button>
@@ -442,7 +435,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       </div>
       <!-- Wife wishes banner -->
       <div class="wife-wishes-banner" id="wife-wishes-banner">
-        <div class="wwb-title">💜 Она хочет от тебя кое-что</div>
+        <div class="wwb-title">💜 Сегодня ей важно</div>
         <div class="wwb-body" id="wwb-body">Загружаем...</div>
       </div>
       <!-- Remote mode banner -->
@@ -454,20 +447,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div class="ai-gen-card" id="ai-gen-card">
         <div class="ai-pulse">
           <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
-          <span style="font-size:13px;font-weight:600;margin-left:4px">Подбираем что сработает...</span>
+          <span style="font-size:13px;font-weight:600;margin-left:4px">Подбираем что может помочь сегодня...</span>
         </div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px">На основе того, что важно именно ей</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px">С учётом того, что важно именно ей</div>
       </div>
       <div id="tasks-list"></div>
       <div id="all-done-banner" style="display:none" class="all-done-banner">
         <span class="adb-big">🏆</span>
-        <p style="color:var(--green);font-weight:600;font-size:16px">Ты сделал больше, чем 80% мужчин</p>
-        <p style="color:var(--text3);font-size:13px;margin-top:6px">Продолжай — и она это почувствует</p>
+        <p style="color:var(--green);font-weight:600;font-size:16px">Сегодня ты выбрал быть лучше</p>
+        <p style="color:var(--text3);font-size:13px;margin-top:6px">Такие моменты и строят настоящие отношения</p>
       </div>
     </div>
     <div class="tpanel" id="hp-streak">
       <div class="sec-title">Ты держишь темп</div>
-      <div class="sec-sub">Вот так и строятся нормальные отношения</div>
+      <div class="sec-sub">Постоянство — это и есть характер</div>
       <div class="card">
         <div class="prow"><span class="ptitle">Дней подряд</span><span class="pval" id="h-st-days">0 дней</span></div>
         <div class="pbar-wrap"><div class="pbar-fill" id="h-st-bar" style="width:0%"></div></div>
@@ -476,7 +469,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     </div>
     <div class="tpanel" id="hp-rewards">
       <div class="sec-title">Ты не просто стараешься — ты растёшь</div>
-      <div class="sec-sub">Такие вещи реально меняют отношения</div>
+      <div class="sec-sub">Постоянная забота — это уже другой уровень отношений</div>
       <div id="rewards-list"></div>
     </div>
   </div>
@@ -827,16 +820,16 @@ const TASK_DB = {
     // ── РЯДОМ ──
     {t:'Проведи 20 минут вместе без телефона — только вы двое',m:'Час твоего внимания дороже любого подарка.',remote:false},
     {t:'Предложи ей вечерний чай или кофе — и посиди рядом, никуда не торопись',m:'Быть рядом — это тоже поступок.',remote:false},
-    {t:'Спроси как прошёл её день и правда послушай — не перебивай',m:'Слышать — это другое чем просто слушать.',remote:false},
+    {t:'Спроси как прошёл её день и выслушай без советов — просто с интересом',m:'Это может помочь ей почувствовать, что её слышат.',remote:false},
     {t:'Посмотрите вместе сериал или фильм по её выбору без комментариев',m:'Её время — твоё время.',remote:false},
     {t:'Предложи утром вместе выпить кофе — без спешки, не смотри в телефон',m:'Утро вдвоём задаёт тон всему дню.',remote:false},
     {t:'Пригласи её на прогулку — без цели, просто идти рядом',m:'Присутствие — самый честный язык.',remote:false},
-    {t:'Отложи телефон на весь вечер и проведи его с ней — её выбор активности',m:'Телефон подождёт. Она — нет.',remote:false},
+    {t:'Отложи телефон на весь вечер и проведи его с ней — её выбор активности',m:'Отложить телефон на вечер — иногда этого достаточно, чтобы момент стал по-настоящему важным.',remote:false},
     {t:'Спроси что она хочет делать сегодня — и сделай именно это',m:'Её желание — твой приоритет.',remote:false},
     {t:'Устрой утреннее время вдвоём: завтрак, разговор, никаких дел',m:'Начало дня задаёт его тон.',remote:false},
     {t:'Поиграйте в настолку или карты — что-то весёлое и без конкуренции',m:'Смеяться вместе — это близость.',remote:false},
     {t:'Предложи сделать что-то чего вы давно не делали вдвоём',m:'Новизна — это инвестиция в отношения.',remote:false},
-    {t:'Посиди рядом пока она занимается своим делом — просто будь рядом',m:'Иногда присутствие важнее активности.',remote:false},
+    {t:'Посиди рядом пока она занимается своим делом — просто будь рядом без отвлечений',m:'Иногда просто быть рядом — достаточно, чтобы человек почувствовал себя нужным.',remote:false},
     {t:'Устрой тихий вечер: приглушённый свет, музыка, вы двое',m:'Атмосфера — это тоже забота.',remote:false},
     {t:'Спроси её о чём-то из детства или юности — послушай с интересом',m:'Знать историю человека — значит любить его глубже.',remote:false},
     {t:'Предложи вместе приготовить что-нибудь — не важно что, важно вместе',m:'Совместный труд сближает.',remote:false},
@@ -1339,7 +1332,19 @@ async function loadProfile(){
   }
 }
 
-async function logout(){pb.signOut();CU=null;CP=null;showScreen('a')}
+async function logout(){
+  pb.signOut();CU=null;CP=null;
+  // Сбрасываем форму входа
+  const btn=document.getElementById('auth-btn');
+  btn.disabled=false;btn.textContent='Войти';
+  document.getElementById('auth-err').classList.remove('show');
+  document.getElementById('ai-email').value='';
+  document.getElementById('ai-pass').value='';
+  document.getElementById('ai-code').value='';
+  // Принудительно режим логина
+  if(authMode!=='login'){authMode='login';toggleMode();}
+  showScreen('a');
+}
 
 // ── WIFE ───────────────────────────────────────────────
 async function initWife(){
@@ -1357,10 +1362,10 @@ async function initWife(){
     checkTodayWife(),
   ]);
   loadQuizPrev();
-  // Показываем таб Задания только если есть муж
+  // Показываем карточку личного пожелания только если есть муж
   const hasHusband2=!!CP.couples?.husband_id;
-  const remTab=document.getElementById('wt-reminders');
-  if(remTab) remTab.style.display=hasHusband2?'flex':'none';
+  const wishCard=document.getElementById('wish-card');
+  if(wishCard) wishCard.style.display=hasHusband2?'block':'none';
 }
 
 function wTab(t){
@@ -1444,6 +1449,9 @@ async function checkTodayWife(){
     const chip=document.querySelector(`.chip[data-lang="${pref.language}"]`);
     if(chip){chip.classList.add('sel');selLang=pref.language;}
     if(pref.wish_text) document.getElementById('wife-wish-text').value=pref.wish_text;
+    // Показываем карточку личного пожелания после того как утреннее заполнено
+    const wc=document.getElementById('wish-card');
+    if(wc && CP.couples?.husband_id) wc.style.display='block';
   }
   if(fb) document.getElementById('fb-saved').style.display='block';
 }
@@ -1467,7 +1475,10 @@ async function saveMorning(){
   });
   loading(false);
   document.getElementById('morning-saved').style.display='block';
-  toast('💕 Пожелание отправлено мужу!');
+  // Показываем блок личного пожелания
+  const wc=document.getElementById('wish-card');
+  if(wc && CP.couples?.husband_id) wc.style.display='block';
+  toast('💕 Состояние сохранено!');
 }
 
 function pickFb(el){document.querySelectorAll('.fb-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');selFb=el.dataset.v}
@@ -1516,7 +1527,7 @@ async function saveRemSingle(){
   loading(false);
   const msg=document.getElementById('rem-saved-msg');
   if(msg){msg.style.display='block';setTimeout(()=>msg.style.display='none',3000);}
-  toast('✅ Он получит это сегодня! Муж получит его в заданиях.');
+  toast('✅ Учтём в заданиях сегодня!');
 }
 
 // ── QUIZ ───────────────────────────────────────────────
@@ -1606,7 +1617,7 @@ function loadQuizPrev(){
 async function initHusband(){
   showScreen('h');
   const h=new Date().getHours();
-  document.getElementById('h-greet').textContent=(h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер')+', чемпион!';
+  document.getElementById('h-greet').textContent=(h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер')+'!';
   await loadHusbandData();
   initNotifications();
 }
@@ -1662,7 +1673,7 @@ function loadTodayTasksLocally() {
 }
 
 async function loadHusbandData(){
-  loading(true,'Подбираем что сработает...');
+  loading(true,'Подбираем что может помочь сегодня...');
   const today=getLocalDateStr();
 
   // Все запросы параллельно — вместо 5 последовательных запросов
@@ -1854,9 +1865,9 @@ async function completeTask(i){
   setTimeout(()=>{
     renderTasks();
     launchConfetti(28);
-    toast('💪 Сделал — она это почувствует');
+    toast('💪 Сделал — такие моменты меняют отношения');
     if(hTasks.every(t=>t.done)){
-      setTimeout(()=>{launchConfetti(70);toast('🏆 Ты сделал больше, чем 80% мужчин!')},600);
+      setTimeout(()=>{launchConfetti(70);toast('🏆 Сегодня ты выбрал быть лучше!')},600);
     }
     // Start cooldown countdown to re-render when unlocked
     if(!hTasks.every(t=>t.done)){
@@ -2080,7 +2091,7 @@ function scheduleNotifs(){
     const t=new Date(now);t.setHours(s.h,0,0,0);
     if(t<=now) t.setDate(t.getDate()+1);
     setTimeout(function fire(){
-      if(Notification.permission==='granted') new Notification('Сегодня ты делаешь лучше',{body:s.txt});
+      if(Notification.permission==='granted') new Notification('Сегодня есть возможность сделать лучше',{body:s.txt});
       setTimeout(fire,86400000);
     },t-now);
   });
