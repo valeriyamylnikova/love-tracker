@@ -342,11 +342,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <button class="chip" data-lang="help" onclick="pickLang(this)">🤝 Помощь</button>
           <button class="chip" data-lang="touch" onclick="pickLang(this)">🤗 Прикосновения</button>
         </div>
-        <div class="fg" style="margin-top:14px">
-          <label class="fl">Чего тебе сейчас не хватает?</label>
-          <textarea class="fi" id="wife-wish-text" rows="2" placeholder="Внимание, тепло, поддержка, разговор..." style="resize:none;height:60px"></textarea>
-        </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">Ты просто делишься тем, что для тебя важно — мы учтём это при подборе действий</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5">Ты просто делишься тем, что для тебя важно — мы учтём это при подборе действий</div>
+        <textarea id="wife-wish-text" style="display:none"></textarea>
         <button class="bsec" style="margin-top:14px;width:100%" onclick="saveMorning()">Сохранить</button>
         <div id="morning-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Состояние сохранено</div>
       </div>
@@ -1100,17 +1097,18 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
 - Никакого алкоголя, ничего что раздражает жену
 - Задания конкретные и выполнимые за один день
 - Мотивирующие фразы — в стиле прямого мужского разговора, без сентиментальщины
-- Учитывай язык любви жены при выборе категорий
-${hasPersonalTask ? `- ОБЯЗАТЕЛЬНО: первое задание должно быть основано на личном пожелании жены. Можешь перефразировать, но смысл сохрани. Категория: "reminder"` : ''}`;
+- Учитывай язык любви при выборе категорий
+- Задания должны ощущаться как естественный личный выбор, а не чьи-то указания
+- Если есть эмоциональный контекст — учти его органично, не привязывая задание к нему напрямую`;
 
-  let userMsg = `Язык любви жены (главный): ${langNames[topLang]}`;
+  let userMsg = `Приоритетный язык любви: ${langNames[topLang]}`;
   if (secondLang) userMsg += `\nВторой язык любви: ${langNames[secondLang]}`;
-  if (wifePrefLang) userMsg += `\nСегодня жена выбрала приоритет: ${langNames[wifePrefLang]}`;
-  if (wifeWish) userMsg += `\nТекстовое пожелание жены на сегодня: "${wifeWish}"`;
+  if (wifePrefLang) userMsg += `\nСегодняшний приоритет: ${langNames[wifePrefLang]}`;
+  if (wifeWish) userMsg += `\nЭмоциональный контекст дня: "${wifeWish}"`;
   if (hasPersonalTask) {
-    userMsg += `\n\n⚠️ ЛИЧНОЕ ПОЖЕЛАНИЕ ЖЕНЫ (включить первым заданием обязательно): "${customRems[0].task}"`;
+    userMsg += `\nДополнительный контекст (учти по смыслу, не копируй буквально): "${customRems[0].task}"`;
   }
-  userMsg += '\n\nСгенерируй ровно 3 задания. Первое — личное пожелание жены (если есть), остальные — под язык любви.';
+  userMsg += '\n\nСгенерируй ровно 3 задания из разных категорий. Весь контекст учитывай органично — задания должны выглядеть как осознанный личный выбор.';
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
