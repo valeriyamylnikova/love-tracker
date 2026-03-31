@@ -1111,12 +1111,10 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
   userMsg += '\n\nСгенерируй ровно 3 задания из разных категорий. Весь контекст учитывай органично — задания должны выглядеть как осознанный личный выбор.';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://node-valeriyamyl.amvera.io/ai/generate-tasks', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
         system: systemPrompt,
         messages: [{role: 'user', content: userMsg}]
       })
