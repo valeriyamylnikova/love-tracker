@@ -262,7 +262,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 </head>
 <body>
 
-<div id="ldr"><div class="spin"></div><div class="ltxt">Загружаем...</div></div>
+<div id="ldr" class="hidden"><div class="spin"></div><div class="ltxt">Загружаем...</div></div>
 <div id="toast"></div>
 
 <!-- SPLASH -->
@@ -343,7 +343,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <button class="chip" data-lang="touch" onclick="pickLang(this)">🤗 Прикосновения</button>
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5">Ты просто делишься тем, что для тебя важно — мы учтём это при подборе действий</div>
-        <textarea id="wife-wish-text" style="display:none"></textarea>
         <button class="bsec" style="margin-top:14px;width:100%" onclick="saveMorning()">Сохранить</button>
         <div id="morning-saved" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-top:10px;text-align:center">✅ Состояние сохранено</div>
       </div>
@@ -1290,20 +1289,22 @@ async function doAuth(){
 
 async function createProfile(role,code){
   loading(true,'Создаём профиль...');
+  // Разблокировка кнопки регистрации при любой ошибке
+  const rb=()=>{const b=document.getElementById('auth-btn');b.disabled=false;b.textContent='Зарегистрироваться';};
   let coupleId=null;
   if(role==='wife'){
     const c='LOVE'+Math.floor(1000+Math.random()*9000);
     const {data:couple,error:ce}=await pb.insert('couples',{couple_code:c,relationship_score:0,wife_id:CU.id});
-    if(ce){loading(false);showErr('Ошибка создания пары: '+ce.message);return}
+    if(ce){loading(false);showErr('Ошибка создания пары: '+ce.message);rb();return}
     coupleId=couple.id;
   } else {
     const {data:couple,error:ce}=await pb.getOne('couples',`couple_code="${code}"`);
-    if(ce||!couple){loading(false);showErr('Код пары не найден');return}
+    if(ce||!couple){loading(false);showErr('Код пары не найден');rb();return}
     coupleId=couple.id;
     await pb.update('couples',coupleId,{husband_id:CU.id});
   }
   const {error:ue}=await pb.insert('profiles',{user_id:CU.id,role,couple_id:coupleId,score:0,streak:0});
-  if(ue){loading(false);showErr('Ошибка профиля: '+ue.message);return}
+  if(ue){loading(false);showErr('Ошибка профиля: '+ue.message);rb();return}
   await loadProfile();
 }
 
@@ -1323,7 +1324,12 @@ async function loadProfile(){
     if(p.role==='wife') await initWife();
     else await initHusband();
   }catch(e){
-    loading(false);showErr(e.message);
+    loading(false);
+    // Сессия недействительна/истёк токен — не оставляем пустой экран, а возвращаем на вход
+    pb.signOut();CU=null;CP=null;
+    if(authMode!=='login'){authMode='login';toggleMode();}
+    showScreen('a');
+    showErr(e.message);
     const btn=document.getElementById('auth-btn');btn.disabled=false;btn.textContent='Войти';
   }
 }
@@ -1388,6 +1394,22 @@ async function loadWifeProgress(){
 
 async function renderActivityFeed(allComps, todayComps){
   const feed=document.getElementById('w-feed');
+
+  // Если муж сохранял текст заданий (task_text) — показываем РЕАЛЬНО выполненные задания
+  const withText=(todayComps||[]).filter(c=>c.task_text);
+  if(withText.length){
+    feed.innerHTML='<div style="padding:4px 0">'+withText.map(c=>`
+      <div class="act-item">
+        <div class="act-ic">✅</div>
+        <div class="act-body">
+          <div class="act-title act-done">${c.task_text}</div>
+          <div class="act-time">${CAT_LABELS[c.task_cat]||''}</div>
+        </div>
+      </div>`).join('')+'</div>';
+    return;
+  }
+
+  // Fallback (старые записи без task_text): показываем сгенерированные задания, отметка по категории
   // Параллельно: ремайндеры + языки любви + пожелание дня
   const today=getLocalDateStr();
   const [
@@ -1444,7 +1466,6 @@ async function checkTodayWife(){
     document.getElementById('morning-saved').style.display='block';
     const chip=document.querySelector(`.chip[data-lang="${pref.language}"]`);
     if(chip){chip.classList.add('sel');selLang=pref.language;}
-    if(pref.wish_text) document.getElementById('wife-wish-text').value=pref.wish_text;
     // Показываем карточку личного пожелания после того как утреннее заполнено
     const wc=document.getElementById('wish-card');
     if(wc && CP.couples?.husband_id) wc.style.display='block';
@@ -1461,12 +1482,10 @@ async function saveMorning(){
   if(!selLang){toast('Выберите язык любви');return}
   loading(true,'Сохраняем...');
   const today=getLocalDateStr();
-  const wishText=document.getElementById('wife-wish-text').value.trim();
   await pb.upsert('daily_preference',`couple_id="${CP.couple_id}" && date="${today}"`,{
     couple_id:CP.couple_id,
     date:today,
     language:selLang,
-    wish_text:wishText||null,
     created_by:CU.id
   });
   loading(false);
@@ -1641,8 +1660,13 @@ function getTodayTasksKey() {
   const today=getLocalDateStr();
   return 'tasks_'+CP.couple_id+'_'+today;
 }
-function saveTodayTasksLocally(tasks, wishApplied=false, remoteMode=false, langHash='') {
+function saveTodayTasksLocally(tasks, wishApplied=false, remoteMode=false, langHash) {
   const today=getLocalDateStr();
+  // Если langHash не передан явно — сохраняем уже записанный, чтобы не сбрасывать его при выполнении задания
+  if(langHash===undefined){
+    const prev=loadTodayTasksLocally();
+    langHash=prev?.langHash||'';
+  }
   const payload={tasks, wishApplied, remoteMode, langHash, date:today};
   localStorage.setItem(getTodayTasksKey(), JSON.stringify(payload));
   // Удаляем ключи прошлых дней
@@ -1694,13 +1718,15 @@ async function loadHusbandData(){
   document.getElementById('h-pts-top').textContent=hPoints;
 
   const prefLang=pref?.language||null;
-  const wifeWish=pref?.wish_text||null;
+  const wifeWish=pref?.wish_text||null; // legacy-поле daily_preference (обычно пустое)
+  // Реальное пожелание жены хранится в reminders — его и показываем/учитываем
+  const wifeReminder=remData?.[0]?.task||null;
 
   // Show wife wishes banner if wish exists
-  if(wifeWish){
+  if(wifeReminder){
     const banner=document.getElementById('wife-wishes-banner');
     const langLabel = prefLang ? (LANG_META[prefLang]?.emoji||'') + ' ' + (LANG_META[prefLang]?.name||prefLang) : '';
-    document.getElementById('wwb-body').textContent = (langLabel?langLabel+' · ':'')+wifeWish;
+    document.getElementById('wwb-body').textContent = (langLabel?langLabel+' · ':'')+wifeReminder;
     banner.classList.add('show');
   }
 
@@ -1717,7 +1743,7 @@ async function loadHusbandData(){
 
   // Нужна ли перегенерация невыполненных заданий?
   const langChanged = saved && savedLangHash !== currentLangHash;
-  const wishAddedLater = saved && wifeWish && !saved.wishApplied;
+  const wishAddedLater = saved && wifeReminder && !saved.wishApplied;
   const needsRegen = (langChanged || wishAddedLater) && !hRemoteMode;
 
   if(saved && saved.tasks && saved.tasks.length && !needsRegen){
@@ -1764,7 +1790,7 @@ async function loadHusbandData(){
       } else {
         hTasks = genTasks(prefLang, ql||[], remData||[], hRemoteMode).map(t=>({...t, done: doneIds.has(t.id)}));
       }
-      saveTodayTasksLocally(hTasks, !!wifeWish, false, currentLangHash);
+      saveTodayTasksLocally(hTasks, !!wifeReminder, false, currentLangHash);
     }
   }
 
@@ -1797,9 +1823,8 @@ function renderTasks(){
   const hasCompleted = hTasks.some(t=>t.done);
 
   list.innerHTML=hTasks.map((t,i)=>{
-    const isLocked = !t.done && hasCompleted && cooldownMs > 0 &&
-      // Check if this is not the first undone task after just completing
-      hTasks.slice(0,i).some(prev=>prev.done);
+    // Во время кулдауна блокируем ВСЕ невыполненные задания — иначе кнопка видна, но клик не срабатывает
+    const isLocked = !t.done && hasCompleted && cooldownMs > 0;
 
     if(t.done){
       return `<div class="task-card done slide-in" id="tc-${i}">
@@ -1846,7 +1871,15 @@ async function completeTask(i){
   const card=document.getElementById('tc-'+i);
   if(card){card.classList.add('completing')}
 
-  await pb.insert('completions',{user_id:CU.id,task_ref:task.id,couple_id:CP.couple_id,completed_at:new Date().toISOString()});
+  // task_text/task_cat — чтобы жена видела реально выполненное задание, а не случайную заглушку
+  const {error:insErr}=await pb.insert('completions',{user_id:CU.id,task_ref:task.id,task_text:task.t,task_cat:task.category,couple_id:CP.couple_id,completed_at:new Date().toISOString()});
+  if(insErr){
+    // Ничего не сохранилось — откатываем UI и не начисляем очки
+    if(btn){btn.disabled=false;btn.textContent='Сделано'}
+    if(card){card.classList.remove('completing')}
+    toast('⚠️ Не удалось сохранить — проверь соединение');
+    return;
+  }
   const np=hPoints+2;
   await pb.update('couples',CP.couple_id,{relationship_score:np});
   hPoints=np;
@@ -2101,7 +2134,7 @@ async function initNotifications(){
 
 // ── INIT ───────────────────────────────────────────────
 async function init(){
-  loading(true);
+  // Лоадер не показываем сразу — пусть отрисуется сплэш; loading(true) вызовется уже в loadProfile
   const session=pb.getSession();
   if(session?.user){
     CU=session.user;
