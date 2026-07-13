@@ -1142,14 +1142,27 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
     });
     const data = await response.json();
     const text = data.content?.find(b => b.type === 'text')?.text || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    if(!text) { console.error('AI: пустой ответ', data); return null; }
+
+    // Слабые модели часто обрамляют JSON текстом или markdown — вырезаем сам JSON
+    let clean = text.replace(/```json|```/g, '').trim();
+    const objStart = clean.indexOf('{'), objEnd = clean.lastIndexOf('}');
+    const arrStart = clean.indexOf('['), arrEnd = clean.lastIndexOf(']');
+    if(objStart !== -1 && objEnd > objStart && (arrStart === -1 || objStart < arrStart)){
+      clean = clean.slice(objStart, objEnd + 1);
+    } else if(arrStart !== -1 && arrEnd > arrStart){
+      clean = clean.slice(arrStart, arrEnd + 1);
+    }
+
+    let parsed;
+    try { parsed = JSON.parse(clean); }
+    catch(pe){ console.error('AI: не удалось разобрать JSON. Ответ модели:', text); return null; }
 
     // Новый формат: {ctx, tasks}. Старый (массив заданий) тоже поддерживаем.
     const list = Array.isArray(parsed) ? parsed : (parsed.tasks || []);
     lastAiCtx = (!Array.isArray(parsed) && parsed.ctx) ? String(parsed.ctx).trim() : '';
 
-    if(!list.length) return null;
+    if(!list.length) { console.error('AI: пустой список заданий', parsed); return null; }
     return list.map((t, i) => ({...t, id: `ai_${t.category}_${i}_${Date.now()}`, done: false}));
   } catch(e) {
     console.error('AI generation failed:', e);
