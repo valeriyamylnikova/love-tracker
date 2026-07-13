@@ -406,7 +406,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-title">💪 Сегодня есть возможность стать лучше</div>
     <div class="topbar-right">
       <div class="pts-widget"><span>⭐</span><div class="pts-num" id="h-pts-top">0</div></div>
-      <button class="bic" id="remote-toggle" onclick="toggleRemoteMode()" title="Режим на расстоянии" style="font-size:18px">🏠</button>
+      <button class="bic" id="remote-toggle" onclick="toggleRemoteMode()" title="Переключить: вы вместе или на расстоянии" style="font-size:12px;font-weight:600;width:auto;padding:0 12px;height:34px;border-radius:17px;white-space:nowrap">🏠 Мы рядом</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
   </div>
@@ -1072,7 +1072,7 @@ const TASK_DB = {
 };
 
 // ── AI TASK GENERATION ─────────────────────────────────
-async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems) {
+async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems, isRemote=false) {
   const topLang = wifeLangs?.[0]?.lang || wifePrefLang || 'words';
   const secondLang = wifeLangs?.[1]?.lang || null;
 
@@ -1120,7 +1120,15 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
 - Ровно 3 задания, категории разные.
 - Конкретные, выполнимые сегодня, без алкоголя.
 - Категории подбирай под её языки любви и контекст дня.
-- Задание должно читаться как его собственная идея, а не как переданная просьба.`;
+- Задание должно читаться как его собственная идея, а не как переданная просьба.${isRemote ? `
+
+⚠️ ОСОБЫЙ РЕЖИМ: ОНИ СЕЙЧАС НЕ ВМЕСТЕ
+Они физически в разных местах (командировка, поездка, больница). Это меняет ВСЁ:
+- Каждое задание обязано быть выполнимым НА РАССТОЯНИИ: сообщение, голосовое, звонок, видеосвязь, доставка, заказ с курьером, что-то отправленное.
+- НИКАКИХ действий, требующих присутствия рядом: не "обними", не "приготовь ужин", не "посмотрите фильм вместе на диване".
+- Её пожелание всё равно переводи — но найди дистанционный способ его исполнить. Например: хочется подарка → закажи доставку; хочется объятий → голосовое, где слышно, что он рядом душой; хочется времени вместе → видеозвонок без спешки.
+- Категорию "touch" (прикосновения) на расстоянии не используй — замени на слова, время или подарки.
+- В строке "ctx" учти разлуку: он далеко, но это не делает его менее нужным ей.` : ''}`;
 
   let userMsg = `Её главный язык любви: ${langNames[topLang]}`;
   if (secondLang) userMsg += `\nВторой язык любви: ${langNames[secondLang]}`;
@@ -1720,9 +1728,10 @@ function saveTodayTasksLocally(tasks, wishApplied=false, remoteMode=false, langH
 }
 
 // Хэш из языков любви + языка дня — если поменялся, задания устарели
-function makeLangHash(ql, prefLang, remTask) {
+function makeLangHash(ql, prefLang, remTask, remote) {
   const top = (ql||[]).slice(0,2).map(l=>l.lang).join(',');
-  return top + '|' + (prefLang||'') + '|' + (remTask||'');
+  const r = (remote===undefined) ? (typeof hRemoteMode!=='undefined' && hRemoteMode) : remote;
+  return top + '|' + (prefLang||'') + '|' + (remTask||'') + '|' + (r ? 'away' : 'home');
 }
 function loadTodayTasksLocally() {
   try {
@@ -1772,7 +1781,7 @@ async function loadHusbandData(){
 
   // Check if we already have tasks for today saved locally
   const saved = loadTodayTasksLocally();
-  hRemoteMode = saved?.remoteMode || false;
+  hRemoteMode = loadRemoteMode() || saved?.remoteMode || false;
   updateRemoteToggle();
 
   // Текущий хэш входных данных — если поменялся, задания нужно перегенерировать
@@ -1794,7 +1803,7 @@ async function loadHusbandData(){
     if(needed > 0){
       const reason = langChanged ? 'Языки любви обновились' : 'Жена оставила пожелание';
       loading(true, reason + ' — обновляем задания...');
-      const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[]);
+      const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
       loading(false);
       if(aiTasks && aiTasks.length){
         // Берём нужное кол-во новых заданий, не дублируя категории выполненных
@@ -1821,12 +1830,12 @@ async function loadHusbandData(){
       const aiCard = document.getElementById('ai-gen-card');
       aiCard.classList.add('show');
       loading(false);
-      const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[]);
+      const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
       aiCard.classList.remove('show');
       if(aiTasks && aiTasks.length){
         hTasks = aiTasks.map(t=>({...t, done: doneIds.has(t.id)}));
       } else {
-        hTasks = genTasks(prefLang, ql||[], remData||[], hRemoteMode).map(t=>({...t, done: doneIds.has(t.id)}));
+        hTasks = (hRemoteMode ? getRemoteTasks() : genTasks(prefLang, ql||[], remData||[], false)).map(t=>({...t, done: doneIds.has(t.id)}));
       }
       saveTodayTasksLocally(hTasks, !!wifeReminder, false, currentLangHash);
     }
@@ -1978,66 +1987,70 @@ function updateRemoteToggle(){
   const banner=document.getElementById('remote-mode-banner');
   if(!btn) return;
   if(hRemoteMode){
-    btn.textContent='✈️';
+    btn.textContent='✈️ Мы не рядом';
     btn.classList.add('remote-on');
     if(banner) banner.style.display='block';
   } else {
-    btn.textContent='🏠';
+    btn.textContent='🏠 Мы рядом';
     btn.classList.remove('remote-on');
     if(banner) banner.style.display='none';
   }
 }
 
+// Режим "не рядом" держится, пока его не выключат (поездка длится не один день)
+function remoteModeKey(){ return 'remote_mode_'+(CP?.couple_id||''); }
+function saveRemoteMode(on){
+  try{ localStorage.setItem(remoteModeKey(), on ? '1' : '0'); }catch(e){}
+}
+function loadRemoteMode(){
+  try{ return localStorage.getItem(remoteModeKey())==='1'; }catch(e){ return false; }
+}
+
 async function toggleRemoteMode(){
   hRemoteMode = !hRemoteMode;
   updateRemoteToggle();
+  saveRemoteMode(hRemoteMode);  // запоминаем надолго, не только на сегодня
 
-  // Сбрасываем задания и генерируем новые под режим
   const today=getLocalDateStr();
   const doneTasksToKeep = hTasks.filter(t=>t.done);
 
-  if(hRemoteMode){
-    // Переключились на дистанционный режим
-    const remoteTasks = getRemoteTasks();
-    // Сохраняем выполненные, остальные заменяем дистанционными
-    if(doneTasksToKeep.length > 0){
-      const needed = 3 - doneTasksToKeep.length;
-      hTasks = [...doneTasksToKeep, ...remoteTasks.slice(0, needed)];
-    } else {
-      hTasks = remoteTasks;
-    }
-    saveTodayTasksLocally(hTasks, false, true);
-    toast('✈️ Режим на расстоянии включён');
+  // В ОБОИХ режимах задания генерирует AI — просто с разным контекстом
+  const [
+    {data:qlR},
+    {data:pref},
+    {data:remData}
+  ] = await Promise.all([
+    pb.getList('love_language_results',`couple_id="${CP.couple_id}"`,'pct'),
+    pb.getOne('daily_preference',`couple_id="${CP.couple_id}" && date="${today}"`),
+    pb.getList('reminders',`couple_id="${CP.couple_id}"`)
+  ]);
+  const ql = (qlR||[]).sort((a,b)=>b.pct-a.pct);
+  const prefLang=pref?.language||null;
+  const wifeWish=pref?.wish_text||null;
+  const wifeReminder=remData?.[0]?.task||null;
+
+  const aiCard=document.getElementById('ai-gen-card');
+  aiCard.classList.add('show');
+  const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
+  aiCard.classList.remove('show');
+
+  // Если AI недоступен — запасной вариант под текущий режим
+  const newTasks = aiTasks?.length
+    ? aiTasks.map(t=>({...t,done:false}))
+    : (hRemoteMode
+        ? getRemoteTasks().map(t=>({...t,done:false}))
+        : genTasks(prefLang,ql||[],remData||[],false).map(t=>({...t,done:false})));
+
+  if(doneTasksToKeep.length > 0){
+    const needed = 3 - doneTasksToKeep.length;
+    hTasks = [...doneTasksToKeep, ...newTasks.slice(0, needed)];
   } else {
-    // Вернулись домой — генерируем обычные задания
-    const [
-      {data:qlR},
-      {data:pref},
-      {data:remData}
-    ] = await Promise.all([
-      pb.getList('love_language_results',`couple_id="${CP.couple_id}"`,'pct'),
-      pb.getOne('daily_preference',`couple_id="${CP.couple_id}" && date="${today}"`),
-      pb.getList('reminders',`couple_id="${CP.couple_id}"`)
-    ]);
-    const ql = (qlR||[]).sort((a,b)=>b.pct-a.pct);
-    const prefLang=pref?.language||null;
-    const wifeWish=pref?.wish_text||null;
-    const aiCard=document.getElementById('ai-gen-card');
-    aiCard.classList.add('show');
-    const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[]);
-    aiCard.classList.remove('show');
-    const newTasks = aiTasks?.length
-      ? aiTasks.map(t=>({...t,done:false}))
-      : genTasks(prefLang,ql||[],remData||[],false).map(t=>({...t,done:false}));
-    if(doneTasksToKeep.length > 0){
-      const needed = 3 - doneTasksToKeep.length;
-      hTasks = [...doneTasksToKeep, ...newTasks.slice(0, needed)];
-    } else {
-      hTasks = newTasks;
-    }
-    saveTodayTasksLocally(hTasks, !!wifeWish, false);
-    toast('🏠 Вернулся домой — задания обновлены');
+    hTasks = newTasks;
   }
+
+  const curHash = makeLangHash(ql||[], prefLang, wifeReminder);
+  saveTodayTasksLocally(hTasks, !!wifeReminder, hRemoteMode, curHash);
+  toast(hRemoteMode ? '✈️ Вы не рядом — задания на расстоянии' : '🏠 Вы снова вместе — задания обновлены');
   renderTasks();
 }
 
