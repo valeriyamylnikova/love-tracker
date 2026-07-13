@@ -594,6 +594,7 @@ const pb = {
 let CU=null, CP=null, authMode='login', selRole='wife';
 let reminders=[], selLang=null, selFb=null;
 let hTasks=[], hStreak=0, hPoints=0, hRemoteMode=false;
+let lastAiCtx='';  // Переведённая на мужской язык строка контекста для баннера
 let quizAnswers=[], quizIdx=0;
 
 // ── COOLDOWN: 30 минут между заданиями ─────────────────
@@ -1085,29 +1086,50 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
 
   const hasPersonalTask = customRems?.length > 0;
 
-  const systemPrompt = `Ты помощник для приложения "Любовный Трекер". Генерируй задания для мужа на сегодня.
-Отвечай ТОЛЬКО JSON без markdown. Формат:
-[
-  {"t": "текст задания", "m": "мотивирующая фраза в мужском стиле", "category": "words|time|gifts|help|touch|reminder"},
-  ...
-]
-Правила:
-- Ровно 3 задания
-- Никакого алкоголя, ничего что раздражает жену
-- Задания конкретные и выполнимые за один день
-- Мотивирующие фразы — в стиле прямого мужского разговора, без сентиментальщины
-- Учитывай язык любви при выборе категорий
-- Задания должны ощущаться как естественный личный выбор, а не чьи-то указания
-- Если есть эмоциональный контекст — учти его органично, не привязывая задание к нему напрямую`;
+  const systemPrompt = `Ты — переводчик с женского языка на мужской в приложении для супружеских пар.
 
-  let userMsg = `Приоритетный язык любви: ${langNames[topLang]}`;
+ЗАДАЧА
+Взять то, что сегодня важно жене, и превратить это в 3 конкретных действия для мужа + одну строку контекста для него.
+
+ГЛАВНЫЙ ПРИНЦИП
+Мужчина не должен чувствовать вину, долг, упрёк или что его воспитывают. Он должен чувствовать: он сильный, он способный, он сам так решил — и именно он может сделать её день лучше. Это его выбор, а не её требование.
+
+КАК ПЕРЕВОДИТЬ
+- Её эмоцию превращай в его миссию. Пример: "я расстроена, хочу обняться" → ему: "У неё сегодня тяжёлый день. Ты — тот, рядом с кем ей становится спокойно."
+- НИКОГДА не цитируй её слова дословно.
+- НИКОГДА не пиши "она просила", "она хочет", "она ждёт", "ей нужно, чтобы ты".
+- НИКОГДА не намекай, что он чего-то не сделал, что-то задолжал или в чём-то виноват. Если ей тяжело — это не его вина.
+
+ТОН МОТИВАЦИИ (поле "m")
+- Коротко, прямо, по-мужски. Как говорит друг, а не как упрекает жена.
+- Работает: сила, способность, влияние, вызов, спокойная уверенность. "Тебе это ничего не стоит — а для неё это много", "ты умеешь это лучше, чем думаешь", "здесь всё зависит от тебя".
+- ЗАПРЕЩЕНО: "она заслужила", "ты должен", "обязательно", "не забудь", "сделай это сейчас", любые приказы, упрёки, нытьё, сентиментальность и слащавость.
+
+ФОРМАТ ОТВЕТА
+Отвечай ТОЛЬКО валидным JSON без markdown:
+{
+  "ctx": "одно короткое предложение мужу: что сегодня происходит с ней. Перевод, а не цитата. Без вины, без просьб, без 'она хочет'.",
+  "tasks": [
+    {"t": "конкретное действие", "m": "мотивация в мужском тоне", "category": "words|time|gifts|help|touch"},
+    {"t": "...", "m": "...", "category": "..."},
+    {"t": "...", "m": "...", "category": "..."}
+  ]
+}
+
+ПРАВИЛА ЗАДАНИЙ
+- Ровно 3 задания, категории разные.
+- Конкретные, выполнимые сегодня, без алкоголя.
+- Категории подбирай под её языки любви и контекст дня.
+- Задание должно читаться как его собственная идея, а не как переданная просьба.`;
+
+  let userMsg = `Её главный язык любви: ${langNames[topLang]}`;
   if (secondLang) userMsg += `\nВторой язык любви: ${langNames[secondLang]}`;
-  if (wifePrefLang) userMsg += `\nСегодняшний приоритет: ${langNames[wifePrefLang]}`;
-  if (wifeWish) userMsg += `\nЭмоциональный контекст дня: "${wifeWish}"`;
+  if (wifePrefLang) userMsg += `\nЧто ей важнее всего именно сегодня: ${langNames[wifePrefLang]}`;
+  if (wifeWish) userMsg += `\nЕё состояние сегодня: "${wifeWish}"`;
   if (hasPersonalTask) {
-    userMsg += `\nДополнительный контекст (учти по смыслу, не копируй буквально): "${customRems[0].task}"`;
+    userMsg += `\n\nЕЁ СЛОВАМИ (сырой материал для перевода — НЕ показывай мужу дословно, переведи на мужской язык): "${customRems[0].task}"`;
   }
-  userMsg += '\n\nСгенерируй ровно 3 задания из разных категорий. Весь контекст учитывай органично — задания должны выглядеть как осознанный личный выбор.';
+  userMsg += '\n\nПереведи это для мужа: дай строку "ctx" и ровно 3 задания. Он не виноват, он сильный, и он сам так решил.';
 
   try {
     const response = await fetch('https://node-valeriyamyl.amvera.io/ai/generate-tasks', {
@@ -1122,7 +1144,13 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
     const text = data.content?.find(b => b.type === 'text')?.text || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
-    return parsed.map((t, i) => ({...t, id: `ai_${t.category}_${i}_${Date.now()}`, done: false}));
+
+    // Новый формат: {ctx, tasks}. Старый (массив заданий) тоже поддерживаем.
+    const list = Array.isArray(parsed) ? parsed : (parsed.tasks || []);
+    lastAiCtx = (!Array.isArray(parsed) && parsed.ctx) ? String(parsed.ctx).trim() : '';
+
+    if(!list.length) return null;
+    return list.map((t, i) => ({...t, id: `ai_${t.category}_${i}_${Date.now()}`, done: false}));
   } catch(e) {
     console.error('AI generation failed:', e);
     return null;
@@ -1152,7 +1180,7 @@ function genTasks(prefLang, wifeLangs, customRems, remoteMode) {
   // Личное пожелание жены — ПЕРВЫМ и обязательно
   if (customRems?.length) {
     const r = customRems[0];
-    pool.push({t:r.task, m:'Это личная просьба. Выполни.', category:'reminder', id:'rem_'+(r.id||'0'), done:false, remote:true});
+    pool.push({t:r.task, m:'Тебе это ничего не стоит — а для неё это много.', category:'reminder', id:'rem_'+(r.id||'0'), done:false, remote:true});
   }
 
   // Добираем по языкам любви до 3
@@ -1667,7 +1695,9 @@ function saveTodayTasksLocally(tasks, wishApplied=false, remoteMode=false, langH
     const prev=loadTodayTasksLocally();
     langHash=prev?.langHash||'';
   }
-  const payload={tasks, wishApplied, remoteMode, langHash, date:today};
+  // Переведённый контекст сохраняем вместе с заданиями (иначе теряется при перезагрузке)
+  const prevCtx = loadTodayTasksLocally()?.ctx || '';
+  const payload={tasks, wishApplied, remoteMode, langHash, ctx: lastAiCtx || prevCtx, date:today};
   localStorage.setItem(getTodayTasksKey(), JSON.stringify(payload));
   // Удаляем ключи прошлых дней
   const todayKey=getTodayTasksKey();
@@ -1722,13 +1752,8 @@ async function loadHusbandData(){
   // Реальное пожелание жены хранится в reminders — его и показываем/учитываем
   const wifeReminder=remData?.[0]?.task||null;
 
-  // Show wife wishes banner if wish exists
-  if(wifeReminder){
-    const banner=document.getElementById('wife-wishes-banner');
-    const langLabel = prefLang ? (LANG_META[prefLang]?.emoji||'') + ' ' + (LANG_META[prefLang]?.name||prefLang) : '';
-    document.getElementById('wwb-body').textContent = (langLabel?langLabel+' · ':'')+wifeReminder;
-    banner.classList.add('show');
-  }
+  // Баннер рисуется ниже, ПОСЛЕ генерации — чтобы показать переведённый контекст,
+  // а не сырые слова жены (дословный текст ломает ощущение "это мой выбор")
 
   const doneIds=new Set((todayC||[]).map(c=>c.task_ref));
 
@@ -1791,6 +1816,18 @@ async function loadHusbandData(){
         hTasks = genTasks(prefLang, ql||[], remData||[], hRemoteMode).map(t=>({...t, done: doneIds.has(t.id)}));
       }
       saveTodayTasksLocally(hTasks, !!wifeReminder, false, currentLangHash);
+    }
+  }
+
+  // ── Баннер "Сегодня ей важно" — показываем ПЕРЕВОД, а не слова жены дословно ──
+  if(wifeReminder){
+    // Приоритет: свежий перевод от AI → сохранённый перевод → (если AI недоступен) ничего
+    const ctxLine = lastAiCtx || loadTodayTasksLocally()?.ctx || '';
+    if(ctxLine){
+      const banner=document.getElementById('wife-wishes-banner');
+      const langLabel = prefLang ? (LANG_META[prefLang]?.emoji||'') + ' ' + (LANG_META[prefLang]?.name||prefLang) : '';
+      document.getElementById('wwb-body').textContent = (langLabel?langLabel+' · ':'')+ctxLine;
+      banner.classList.add('show');
     }
   }
 
