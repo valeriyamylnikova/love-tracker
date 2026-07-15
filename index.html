@@ -310,6 +310,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <button class="rb active" onclick="setRole('wife')" id="r-wife">👩 Жена</button>
       <button class="rb" onclick="setRole('husband')" id="r-hus">👨 Муж</button>
     </div>
+    <div id="role-hint" style="display:none;background:rgba(160,96,232,.12);border:1px solid rgba(160,96,232,.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.55;color:var(--text2)"></div>
     <div class="fg" id="name-grp" style="display:none"><label class="fl">Как тебя зовут</label><input class="fi" id="ai-name" type="text" placeholder="Имя или ник" maxlength="40"></div>
     <div class="fg"><label class="fl">Email</label><input class="fi" id="ai-email" type="email" placeholder="your@email.com"></div>
     <div class="fg"><label class="fl">Пароль</label><input class="fi" id="ai-pass" type="password" placeholder="••••••••"></div>
@@ -325,6 +326,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-title">💜 LoveTracker</div>
     <div class="topbar-right">
       <span id="w-code-top" style="font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:700"></span>
+      <button class="bic" onclick="invitePair()" title="Пригласить пару">🔗</button>
       <button class="bic" onclick="showOnboarding(true)" title="Как это работает">?</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
@@ -361,6 +363,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div id="w-feed-wrap" style="display:none">
           <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Что он сделал сегодня:</div></div>
           <div class="card" id="w-feed"></div>
+        </div>
+        <div class="card" style="margin-top:16px;text-align:center">
+          <div style="font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.5">Знаете пару, которой это могло бы помочь?</div>
+          <button class="bsec" style="width:100%" onclick="invitePair()">🔗 Пригласить пару</button>
         </div>
       </div>
     </div>
@@ -445,6 +451,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <span class="sw-lbl" id="sw-text">Мы рядом</span>
         <span class="sw-track" id="sw-track"><span class="sw-knob" id="sw-knob">🏠</span></span>
       </div>
+      <button class="bic" onclick="invitePair()" title="Пригласить пару">🔗</button>
       <button class="bic" onclick="showOnboarding(true)" title="Как это работает">?</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
@@ -501,6 +508,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="pbar-wrap"><div class="pbar-fill" id="h-st-bar" style="width:0%"></div></div>
       </div>
       <div class="sgrid" id="sgrid"></div>
+      <div class="card" style="margin-top:16px;text-align:center">
+        <div style="font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.5">Знаешь пару, которой это зашло бы?</div>
+        <button class="bsec" style="width:100%" onclick="invitePair()">🔗 Пригласить пару</button>
+      </div>
     </div>
     <div class="tpanel" id="hp-rewards">
       <div class="sec-title">Ты не просто стараешься — ты растёшь</div>
@@ -1467,6 +1478,27 @@ async function noticeAnswer(ans){
   else noticeDone('Записала. 💜');
 }
 
+
+// ── ПРИГЛАСИТЬ ПАРУ ──────────────────────────────────
+async function invitePair(){
+  const url = 'https://valeriyamylnikova.github.io/love-tracker/';
+  const text = 'Мы пробуем LoveTracker — маленькие шаги навстречу друг другу каждый день 💜 Попробуйте вдвоём: сначала регистрируется она и получает код пары, потом он входит по этому коду.';
+  const full = text + '\n\n' + url;
+  // На телефоне — системное меню "Поделиться"
+  if(navigator.share){
+    try{ await navigator.share({title:'LoveTracker', text:text, url:url}); return; }
+    catch(e){ if(e.name==='AbortError') return; }
+  }
+  // На компьютере — копируем в буфер
+  try{
+    await navigator.clipboard.writeText(full);
+    toast('🔗 Приглашение скопировано — вставьте в мессенджер');
+  }catch(e){
+    // Совсем запасной вариант
+    prompt('Скопируйте приглашение:', full);
+  }
+}
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s'+id).classList.add('active')}
 
 function launchConfetti(n=30){
@@ -1485,6 +1517,18 @@ function setRole(r){
   document.getElementById('r-wife').classList.toggle('active',r==='wife');
   document.getElementById('r-hus').classList.toggle('active',r==='husband');
   document.getElementById('code-grp').style.display=(r==='husband'&&authMode==='register')?'block':'none';
+  updateRoleHint();
+}
+function updateRoleHint(){
+  const hint=document.getElementById('role-hint');
+  if(!hint) return;
+  if(authMode!=='register'){ hint.style.display='none'; return; }
+  hint.style.display='block';
+  if(selRole==='wife'){
+    hint.innerHTML='💜 <strong>Ты регистрируешься первой.</strong> После регистрации получишь <strong>код пары</strong> — передай его мужу, чтобы он вошёл.';
+  } else {
+    hint.innerHTML='💜 <strong>Нужен код пары от жены.</strong> Сначала регистрируется она и получает код — потом ты входишь по нему. Кода ещё нет? Пусть жена зарегистрируется первой.';
+  }
 }
 function toggleMode(){
   authMode=authMode==='login'?'register':'login';
@@ -1497,6 +1541,7 @@ function toggleMode(){
   document.getElementById('auth-btn').textContent=r?'Зарегистрироваться':'Войти';
   document.getElementById('role-pick').style.display=r?'grid':'none';
   document.getElementById('code-grp').style.display=(r&&selRole==='husband')?'block':'none';
+  updateRoleHint();
 }
 function showErr(msg){const e=document.getElementById('auth-err');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),5000)}
 
