@@ -138,6 +138,25 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .all-done-banner{background:linear-gradient(135deg,#1a3025,#0f2018);border:1px solid var(--green);border-radius:var(--radius);padding:24px;text-align:center;margin-top:10px}
 .adb-big{font-size:48px;display:block;margin-bottom:8px}
 
+/* ONBOARDING */
+.onb-back{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.onb-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:26px 22px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto}
+.onb-box h2{font-size:19px;margin:0 0 14px;line-height:1.35}
+.onb-box p{font-size:14px;line-height:1.65;color:var(--text2);margin:0 0 12px}
+.onb-box strong{color:var(--text)}
+.onb-more{display:none}
+.onb-more.open{display:block}
+.onb-link{background:none;border:none;color:var(--purple);font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline}
+
+/* SWITCHER — режим "рядом / не рядом" */
+.sw-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.sw-lbl{font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap}
+.sw-track{position:relative;width:52px;height:28px;border-radius:14px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);transition:background .25s,border-color .25s;flex-shrink:0}
+.sw-knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;transition:transform .25s cubic-bezier(.4,1.6,.5,1);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.sw-wrap.away .sw-track{background:rgba(160,96,232,.45);border-color:rgba(160,96,232,.7)}
+.sw-wrap.away .sw-knob{transform:translateX(24px)}
+.sw-wrap.away .sw-lbl{color:var(--purple)}
+
 /* AI GENERATING */
 .ai-gen-card{background:linear-gradient(135deg,#1a1030,#0f0a20);border:1px solid rgba(160,96,232,.3);border-radius:var(--radius);padding:20px;margin-bottom:16px;display:none}
 .ai-gen-card.show{display:block}
@@ -262,6 +281,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 </head>
 <body>
 
+<!-- КАК ЭТО РАБОТАЕТ -->
+<div id="onb" class="onb-back" style="display:none">
+  <div class="onb-box">
+    <div id="onb-body"></div>
+    <button class="bpri" style="width:100%;margin-top:18px" onclick="closeOnboarding()">Понятно</button>
+  </div>
+</div>
 <div id="ldr" class="hidden"><div class="spin"></div><div class="ltxt">Загружаем...</div></div>
 <div id="toast"></div>
 
@@ -282,6 +308,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <button class="rb active" onclick="setRole('wife')" id="r-wife">👩 Жена</button>
       <button class="rb" onclick="setRole('husband')" id="r-hus">👨 Муж</button>
     </div>
+    <div class="fg" id="name-grp" style="display:none"><label class="fl">Как тебя зовут</label><input class="fi" id="ai-name" type="text" placeholder="Имя или ник" maxlength="40"></div>
     <div class="fg"><label class="fl">Email</label><input class="fi" id="ai-email" type="email" placeholder="your@email.com"></div>
     <div class="fg"><label class="fl">Пароль</label><input class="fi" id="ai-pass" type="password" placeholder="••••••••"></div>
     <div class="fg" id="code-grp" style="display:none"><label class="fl">Код пары (от жены)</label><input class="fi" id="ai-code" type="text" placeholder="LOVE42" maxlength="8" style="text-transform:uppercase;letter-spacing:3px"></div>
@@ -296,6 +323,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-title">❤️ Как он старается ❤️</div>
     <div class="topbar-right">
       <span id="w-code-top" style="font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:700"></span>
+      <button class="bic" onclick="showOnboarding(true)" title="Как это работает">?</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
   </div>
@@ -325,8 +353,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
             <div class="pstat"><div class="pnum" id="w-total">0</div><div class="plbl">Всего действий</div></div>
           </div>
         </div>
-        <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Сегодня он выбрал позаботиться:</div></div>
-        <div class="card" id="w-feed"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Загружаем...</div></div>
+        <div class="card" id="w-notice" style="background:linear-gradient(135deg,#1a1030,#0f0a20);border-color:rgba(160,96,232,.3);margin-bottom:16px;display:none">
+          <div id="w-notice-body"></div>
+        </div>
+        <div id="w-feed-wrap" style="display:none">
+          <div style="margin-bottom:10px"><div class="sec-title" style="font-size:18px">Что он сделал сегодня:</div></div>
+          <div class="card" id="w-feed"></div>
+        </div>
       </div>
     </div>
 
@@ -406,7 +439,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-title">💪 Сегодня есть возможность стать лучше</div>
     <div class="topbar-right">
       <div class="pts-widget"><span>⭐</span><div class="pts-num" id="h-pts-top">0</div></div>
-      <button class="bic" id="remote-toggle" onclick="toggleRemoteMode()" title="Переключить: вы вместе или на расстоянии" style="font-size:12px;font-weight:600;width:auto;padding:0 12px;height:34px;border-radius:17px;white-space:nowrap">🏠 Мы рядом</button>
+      <div class="sw-wrap" onclick="toggleRemoteMode()" title="Переключи, если вы сейчас в разных местах">
+        <span class="sw-lbl" id="sw-text">Мы рядом</span>
+        <span class="sw-track" id="sw-track"><span class="sw-knob" id="sw-knob">🏠</span></span>
+      </div>
+      <button class="bic" onclick="showOnboarding(true)" title="Как это работает">?</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
   </div>
@@ -600,8 +637,10 @@ let quizAnswers=[], quizIdx=0;
 // ── COOLDOWN: 30 минут между заданиями ─────────────────
 const COOLDOWN_MS = 30 * 60 * 1000; // 30 минут
 
+let lastCompletionServer = 0;  // время последнего выполнения по данным сервера
 function getLastCompletionTime() {
-  return parseInt(localStorage.getItem('last_completion_' + (CU?.id||'')) || '0');
+  const local = parseInt(localStorage.getItem('last_completion_' + (CU?.id||'')) || '0');
+  return Math.max(local, lastCompletionServer);
 }
 function setLastCompletionTime() {
   localStorage.setItem('last_completion_' + (CU?.id||''), Date.now().toString());
@@ -1086,7 +1125,25 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
 
   const hasPersonalTask = customRems?.length > 0;
 
-  const systemPrompt = `Ты — переводчик с женского языка на мужской в приложении для супружеских пар.
+  const remoteBlock = isRemote ? `🚨 ГЛАВНОЕ УСЛОВИЕ СЕГОДНЯ: ОНИ ФИЗИЧЕСКИ НЕ ВМЕСТЕ.
+Он в другом городе / она в больнице / кто-то в отъезде. Они НЕ МОГУТ прикоснуться друг к другу.
+
+ЗАПРЕЩЕНО (это физически невозможно):
+❌ обнять, поцеловать, взять за руку, посмотреть в глаза
+❌ приготовить ужин, сесть рядом, посмотреть фильм вместе
+❌ "подойди к ней", "когда будешь проходить мимо", "вечером дома"
+
+ТОЛЬКО ТАК (всё на расстоянии):
+✅ сообщение, голосовое, звонок, видеосвязь
+✅ заказать доставку (цветы, еда, подарок) с курьером
+✅ отправить фото, плейлист, письмо
+
+Каждое из 3 заданий обязано работать, когда они за сотни километров друг от друга.
+Категорию "touch" НЕ ИСПОЛЬЗУЙ вообще.
+
+` : '';
+
+  const systemPrompt = `${remoteBlock}Ты — переводчик с женского языка на мужской в приложении для супружеских пар.
 
 ЗАДАЧА
 Взять то, что сегодня важно жене, и превратить это в 3 конкретных действия для мужа + одну строку контекста для него.
@@ -1110,7 +1167,7 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
 {
   "ctx": "одно короткое предложение мужу: что сегодня происходит с ней. Перевод, а не цитата. Без вины, без просьб, без 'она хочет'.",
   "tasks": [
-    {"t": "конкретное действие", "m": "мотивация в мужском тоне", "category": "words|time|gifts|help|touch"},
+    {"t": "конкретное действие", "m": "мотивация в мужском тоне", "category": "${isRemote ? 'words|time|gifts' : 'words|time|gifts|help|touch'}"},
     {"t": "...", "m": "...", "category": "..."},
     {"t": "...", "m": "...", "category": "..."}
   ]
@@ -1122,13 +1179,7 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
 - Категории подбирай под её языки любви и контекст дня.
 - Задание должно читаться как его собственная идея, а не как переданная просьба.${isRemote ? `
 
-⚠️ ОСОБЫЙ РЕЖИМ: ОНИ СЕЙЧАС НЕ ВМЕСТЕ
-Они физически в разных местах (командировка, поездка, больница). Это меняет ВСЁ:
-- Каждое задание обязано быть выполнимым НА РАССТОЯНИИ: сообщение, голосовое, звонок, видеосвязь, доставка, заказ с курьером, что-то отправленное.
-- НИКАКИХ действий, требующих присутствия рядом: не "обними", не "приготовь ужин", не "посмотрите фильм вместе на диване".
-- Её пожелание всё равно переводи — но найди дистанционный способ его исполнить. Например: хочется подарка → закажи доставку; хочется объятий → голосовое, где слышно, что он рядом душой; хочется времени вместе → видеозвонок без спешки.
-- Категорию "touch" (прикосновения) на расстоянии не используй — замени на слова, время или подарки.
-- В строке "ctx" учти разлуку: он далеко, но это не делает его менее нужным ей.` : ''}`;
+🚨 НАПОМИНАНИЕ: они не вместе. Перечитай каждое задание — его реально сделать, находясь далеко? Если для него нужно быть рядом — замени.` : ''}`;
 
   let userMsg = `Её главный язык любви: ${langNames[topLang]}`;
   if (secondLang) userMsg += `\nВторой язык любви: ${langNames[secondLang]}`;
@@ -1138,6 +1189,7 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
     userMsg += `\n\nЕЁ СЛОВАМИ (сырой материал для перевода — НЕ показывай мужу дословно, переведи на мужской язык): "${customRems[0].task}"`;
   }
   userMsg += '\n\nПереведи это для мужа: дай строку "ctx" и ровно 3 задания. Он не виноват, он сильный, и он сам так решил.';
+  if(isRemote) userMsg += '\n\n🚨 ОНИ НЕ ВМЕСТЕ ФИЗИЧЕСКИ. Все 3 задания — только на расстоянии (сообщения, звонки, голосовые, доставка). Никаких объятий и совместных вечеров.';
 
   try {
     const response = await fetch('https://node-valeriyamyl.amvera.io/ai/generate-tasks', {
@@ -1171,7 +1223,9 @@ async function generateTasksWithAI(wifeLangs, wifePrefLang, wifeWish, customRems
     lastAiCtx = (!Array.isArray(parsed) && parsed.ctx) ? String(parsed.ctx).trim() : '';
 
     if(!list.length) { console.error('AI: пустой список заданий', parsed); return null; }
-    return list.map((t, i) => ({...t, id: `ai_${t.category}_${i}_${Date.now()}`, done: false}));
+    lastAiModel = data._model || '';
+    // id НЕ присваиваем здесь — их выдаёт вызывающий код (стабильные, по слотам)
+    return list.map(t => ({...t, done: false}));
   } catch(e) {
     console.error('AI generation failed:', e);
     return null;
@@ -1278,6 +1332,139 @@ function toast(msg,dur=2500){
   el.textContent=msg;el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),dur);
 }
+
+// ── КАК ЭТО РАБОТАЕТ ─────────────────────────────────
+const ONB_WIFE = `
+  <h2>💜 Как это работает</h2>
+  <p><strong>Ты не раздаёшь задания.</strong> Ты рассказываешь своими словами, что тебе сейчас важно — и всё.</p>
+  <p><strong>Он не увидит твоих слов.</strong> Он увидит перевод. Не «она просила обнять», а «ей сегодня нужна опора, и ты тот, кто может её дать». Поэтому его шаг остаётся его выбором, а не исполнением просьбы.</p>
+  <p>Это не про контроль и не про то, чтобы проверить, выполнил ли он. Это про то, чтобы тебя услышали в форме, которую он может принять без сопротивления.</p>
+  <p>И ещё про твоё внимание: замечать, что о тебе подумали. Иногда это сложнее, чем кажется — день затягивает.</p>
+`;
+
+const ONB_HUSB_SHORT = `
+  <h2>💪 Как это работает</h2>
+  <p><strong>Один поход в зал не делает сильнее.</strong></p>
+  <p>«Я же говорил, что люблю» — это разовый подход. Форма от этого не держится.</p>
+  <button class="onb-link" onclick="document.getElementById('onb-more').classList.add('open');this.style.display='none'">Читать дальше →</button>
+  <div id="onb-more" class="onb-more">
+    <p>Три небольших действия в день — это не про романтику. Это поддержание формы. Без нагрузки связь слабеет тихо, и замечаешь ты это поздно.</p>
+    <p><strong>Что это даёт тебе.</strong> Когда контакт есть — дома спокойно, тыл держится, есть куда возвращаться. Когда он теряется — растёт фон: холод, раздражение, тяжёлые разговоры. Небольшое усилие каждый день обходится дешевле, чем разбираться с последствиями.</p>
+    <p><strong>Про счёт.</strong> В зале тоже ведут счёт — но не чтобы упрекнуть, а чтобы видеть прогресс. Здесь так же: очки и звания показывают твою форму. Претензий тут нет, есть результат.</p>
+    <p>Её слов ты не увидишь. Приложение переводит их в то, что имеет смысл для тебя. Делать или нет — решаешь ты.</p>
+  </div>
+`;
+
+function onbKey(){ return 'onb_seen_'+(CU?.id||''); }
+
+function showOnboarding(force=false){
+  if(!CP) return;
+  if(!force && localStorage.getItem(onbKey())==='1') return;
+  const isWife = CP.role==='wife';
+  document.getElementById('onb-body').innerHTML = isWife ? ONB_WIFE : ONB_HUSB_SHORT;
+  document.getElementById('onb').style.display='flex';
+}
+
+function closeOnboarding(){
+  document.getElementById('onb').style.display='none';
+  try{ localStorage.setItem(onbKey(),'1'); }catch(e){}
+}
+
+
+// ── "ЗАМЕТЬ ЭТО" — блок для жены ─────────────────────
+// 5 форматов в умной ротации: лёгкие чаще, вовлекающие реже и никогда подряд.
+// Смысл: не показывать список заданий (это убивает спонтанность),
+// а помочь ей ЗАМЕТИТЬ то, что уже случилось.
+const NOTICE_CYCLE = ['ask','quality','diary','ask','warm','quality','ask','guess','diary','quality'];
+
+function noticeFormatForToday(){
+  const d = getLocalDateStr();
+  // Стабильный номер дня — формат не меняется при перезагрузке страницы
+  const days = Math.floor(new Date(d+'T00:00:00').getTime() / 86400000);
+  return NOTICE_CYCLE[days % NOTICE_CYCLE.length];
+}
+
+const CAT_PHRASES = {
+  words:'находил слова для тебя', touch:'тянулся к тебе', time:'выбирал быть рядом',
+  gifts:'думал о тебе, когда тебя не было рядом', help:'снимал с тебя часть груза',
+  reminder:'услышал тебя', remote:'сокращал расстояние'
+};
+
+function qualityLine(doneComps){
+  const cats=[...new Set((doneComps||[]).map(c=>c.task_cat).filter(Boolean))];
+  if(!cats.length) return 'Сегодня он о тебе думал.';
+  const parts=cats.map(c=>CAT_PHRASES[c]).filter(Boolean);
+  if(!parts.length) return 'Сегодня он о тебе думал.';
+  return 'Сегодня он ' + parts.slice(0,2).join(' и ') + '.';
+}
+
+async function saveNoticeAnswer(fmt, answer){
+  try{
+    await pb.insert('notice_log', {
+      couple_id: CP.couple_id, date: getLocalDateStr(),
+      format: fmt, answer: String(answer||'').slice(0,500)
+    });
+  }catch(e){ console.error('notice_log:', e); }
+}
+
+function noticeDone(msg){
+  document.getElementById('w-notice-body').innerHTML =
+    `<div style="font-size:14px;color:var(--text2);line-height:1.6;text-align:center;padding:6px 0">${msg}</div>`;
+}
+
+function revealFeed(){
+  document.getElementById('w-feed-wrap').style.display='block';
+}
+
+function renderNotice(todayComps){
+  const box=document.getElementById('w-notice');
+  const body=document.getElementById('w-notice-body');
+  const done=(todayComps||[]);
+  if(!done.length){ box.style.display='none'; return; }  // ещё нечего замечать
+
+  const fmt = noticeFormatForToday();
+  window._noticeFmt = fmt;
+  box.style.display='block';
+
+  const head = txt => `<div style="font-size:12px;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;font-weight:600">💜 ${txt}</div>`;
+  const btn  = (label,fn) => `<button class="bsec" style="width:100%;margin-top:10px" onclick="${fn}">${label}</button>`;
+
+  if(fmt==='ask'){
+    body.innerHTML = head('остановись на секунду') +
+      `<div style="font-size:15px;color:var(--text);line-height:1.6">Он сегодня к тебе поворачивался. <strong>Заметила?</strong></div>` +
+      btn('Да, заметила', `noticeAnswer('да')`) + btn('Честно — нет', `noticeAnswer('нет')`);
+
+  } else if(fmt==='quality'){
+    body.innerHTML = head('сегодня') +
+      `<div style="font-size:15px;color:var(--text);line-height:1.6">${qualityLine(done)}</div>` +
+      `<div style="font-size:13px;color:var(--text3);margin-top:8px">Вспомни момент — он был.</div>`;
+
+  } else if(fmt==='diary'){
+    body.innerHTML = head('одна минута') +
+      `<div style="font-size:15px;color:var(--text);line-height:1.6;margin-bottom:10px">Что сегодня было хорошего между вами?</div>` +
+      `<textarea id="w-notice-input" rows="2" placeholder="Своими словами..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:14px;resize:none"></textarea>` +
+      btn('Сохранить', `noticeAnswer(document.getElementById('w-notice-input').value)`);
+
+  } else if(fmt==='warm'){
+    body.innerHTML = head('честно') +
+      `<div style="font-size:15px;color:var(--text);line-height:1.6">Было ли сегодня что-то, от чего стало теплее?</div>` +
+      btn('Да, было', `noticeAnswer('тепло:да')`) +
+      btn('Нет, не почувствовала', `noticeAnswer('тепло:нет')`);
+
+  } else if(fmt==='guess'){
+    body.innerHTML = head('маленькая игра') +
+      `<div style="font-size:15px;color:var(--text);line-height:1.6">Он сегодня сделал ${done.length} ${done.length===1?'шаг':'шага'} к тебе. Заметила, какие?</div>` +
+      btn('Показать', `noticeAnswer('guess:показала'); revealFeed();`) +
+      btn('Сначала вспомню сама', `noticeDone('Хорошо. Загляни позже — я подожду. 💜')`);
+  }
+}
+
+async function noticeAnswer(ans){
+  await saveNoticeAnswer(window._noticeFmt||'', ans);
+  if(String(ans).includes('нет')) noticeDone('Так бывает — день затягивает. Это не про твою вину. 💜');
+  else noticeDone('Записала. 💜');
+}
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s'+id).classList.add('active')}
 
 function launchConfetti(n=30){
@@ -1304,17 +1491,34 @@ function toggleMode(){
   document.getElementById('auth-sub').textContent=r?'Начните прямо сейчас':'Введите свои данные';
   document.getElementById('tog-txt').textContent=r?'Уже есть аккаунт?':'Нет аккаунта?';
   document.getElementById('tog-lnk').textContent=r?'Войти':'Зарегистрироваться';
+  document.getElementById('name-grp').style.display=r?'block':'none';
   document.getElementById('auth-btn').textContent=r?'Зарегистрироваться':'Войти';
   document.getElementById('role-pick').style.display=r?'grid':'none';
   document.getElementById('code-grp').style.display=(r&&selRole==='husband')?'block':'none';
 }
 function showErr(msg){const e=document.getElementById('auth-err');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),5000)}
 
+// Проверка email: без этого регистрировались с адресами вроде "asdf" —
+// и человека потом невозможно было ни найти, ни восстановить
+function isValidEmail(e){
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)) return false;
+  const domain = e.split('@')[1].toLowerCase();
+  if(!domain.includes('.') || domain.startsWith('.') || domain.endsWith('.')) return false;
+  // отсекаем очевидные заглушки
+  if(['example.com','test.com','mail.com','asdf.com','qwerty.com','a.aa'].includes(domain)) return false;
+  return true;
+}
+
 async function doAuth(){
   const email=document.getElementById('ai-email').value.trim();
   const pass=document.getElementById('ai-pass').value.trim();
+  const name=(document.getElementById('ai-name')?.value||'').trim();
   if(!email||!pass){showErr('Заполните email и пароль');return}
+  if(!isValidEmail(email)){showErr('Похоже, email указан неверно. Введите настоящий адрес — он понадобится для восстановления доступа');return}
+  if(authMode==='register'&&!name){showErr('Введите имя — так вас будет проще узнать');return}
+  if(authMode==='register'&&name.length<2){showErr('Имя слишком короткое');return}
   if(authMode==='register'&&pass.length<8){showErr('Пароль должен быть минимум 8 символов');return}
+  window._regName = name;
   const btn=document.getElementById('auth-btn');
   btn.disabled=true;btn.textContent=authMode==='login'?'Входим...':'Создаём аккаунт...';
   document.getElementById('auth-err').classList.remove('show');
@@ -1352,7 +1556,7 @@ async function createProfile(role,code){
     coupleId=couple.id;
     await pb.update('couples',coupleId,{husband_id:CU.id});
   }
-  const {error:ue}=await pb.insert('profiles',{user_id:CU.id,role,couple_id:coupleId,score:0,streak:0});
+  const {error:ue}=await pb.insert('profiles',{user_id:CU.id,role,couple_id:coupleId,score:0,streak:0,display_name:(window._regName||'')});
   if(ue){loading(false);showErr('Ошибка профиля: '+ue.message);rb();return}
   await loadProfile();
 }
@@ -1372,6 +1576,7 @@ async function loadProfile(){
     loading(false);
     if(p.role==='wife') await initWife();
     else await initHusband();
+    showOnboarding();  // при первом входе объясняем смысл приложения
   }catch(e){
     loading(false);
     // Сессия недействительна/истёк токен — не оставляем пустой экран, а возвращаем на вход
@@ -1443,6 +1648,9 @@ async function loadWifeProgress(){
 
 async function renderActivityFeed(allComps, todayComps){
   const feed=document.getElementById('w-feed');
+
+  // Блок "заметь это" — вместо прямого списка заданий
+  renderNotice(todayComps);
 
   // Если муж сохранял текст заданий (task_text) — показываем РЕАЛЬНО выполненные задания
   const withText=(todayComps||[]).filter(c=>c.task_text);
@@ -1585,9 +1793,8 @@ async function saveRemSingle(){
   } else {
     reminders=[];
   }
-  // Сбрасываем langHash — муж получит задания с новым пожеланием
-  const saved=loadTodayTasksLocally();
-  if(saved){saved.langHash='__reset__';localStorage.setItem(getTodayTasksKey(),JSON.stringify(saved));}
+  // Задания мужа обновятся сами: хэш пожелания хранится на сервере,
+  // и при следующем входе муж увидит расхождение (раньше сброс писался в браузер жены и до мужа не доходил)
   loading(false);
   const msg=document.getElementById('rem-saved-msg');
   if(msg){msg.style.display='block';setTimeout(()=>msg.style.display='none',3000);}
@@ -1654,12 +1861,6 @@ async function saveQuizResult(){
   loading(true,'Сохраняем результат...');
   await pb.delete('love_language_results',`couple_id="${CP.couple_id}"`);
   for(const r of window._quizSorted){await pb.insert('love_language_results',{...r,couple_id:CP.couple_id,created_by:CU.id});}
-  // Сбрасываем langHash — муж при следующем открытии получит новые задания
-  const saved = loadTodayTasksLocally();
-  if(saved) {
-    saved.langHash = '__reset__';
-    localStorage.setItem(getTodayTasksKey(), JSON.stringify(saved));
-  }
   loading(false);
   toast('💕 Результат сохранён! Задания мужу обновятся.');
   document.getElementById('quiz-result-block').style.display='none';
@@ -1703,45 +1904,63 @@ function getLocalDateStr() {
     String(d.getDate()).padStart(2,'0');
 }
 
-// Хранение сегодняшних заданий в localStorage
-// Ключ содержит дату — каждый день автоматически новые задания
-function getTodayTasksKey() {
+// ── ХРАНЕНИЕ ЗАДАНИЙ ДНЯ ─────────────────────────────
+// Раньше задания жили в localStorage браузера. Телефон чистил хранилище —
+// и муж терял выполненное, а задания генерировались заново. Теперь — на сервере.
+let todayRec = null;   // запись daily_tasks за сегодня
+let lastAiModel = '';  // какая модель сгенерировала (для аналитики)
+
+async function loadTodayTasks(){
   const today=getLocalDateStr();
-  return 'tasks_'+CP.couple_id+'_'+today;
+  const {data} = await pb.getOne('daily_tasks', `couple_id="${CP.couple_id}" && date="${today}"`);
+  todayRec = data || null;
+  if(!todayRec) return null;
+  let tasks = todayRec.tasks;
+  if(typeof tasks === 'string'){ try{ tasks = JSON.parse(tasks); }catch(e){ tasks = []; } }
+  if(!Array.isArray(tasks)) tasks = [];
+  return {
+    tasks,
+    langHash: todayRec.lang_hash || '',
+    wishApplied: !!todayRec.wish_applied,
+    remoteMode: !!todayRec.remote_mode,
+    ctx: todayRec.ctx || ''
+  };
 }
-function saveTodayTasksLocally(tasks, wishApplied=false, remoteMode=false, langHash) {
+
+async function saveTodayTasks(tasks, opts={}){
   const today=getLocalDateStr();
-  // Если langHash не передан явно — сохраняем уже записанный, чтобы не сбрасывать его при выполнении задания
-  if(langHash===undefined){
-    const prev=loadTodayTasksLocally();
-    langHash=prev?.langHash||'';
-  }
-  // Переведённый контекст сохраняем вместе с заданиями (иначе теряется при перезагрузке)
-  const prevCtx = loadTodayTasksLocally()?.ctx || '';
-  const payload={tasks, wishApplied, remoteMode, langHash, ctx: lastAiCtx || prevCtx, date:today};
-  localStorage.setItem(getTodayTasksKey(), JSON.stringify(payload));
-  // Удаляем ключи прошлых дней
-  const todayKey=getTodayTasksKey();
-  Object.keys(localStorage).forEach(k=>{
-    if(k.startsWith('tasks_'+CP.couple_id+'_') && k!==todayKey) localStorage.removeItem(k);
-  });
+  const payload={
+    couple_id: CP.couple_id,
+    date: today,
+    tasks: tasks,
+    lang_hash: opts.langHash || '',
+    wish_applied: !!opts.wishApplied,
+    remote_mode: !!opts.remoteMode,
+    ctx: (opts.ctx !== undefined ? opts.ctx : (lastAiCtx || todayRec?.ctx || '')),
+    wish_text: opts.wishText || todayRec?.wish_text || '',
+    ai_model: opts.model || lastAiModel || todayRec?.ai_model || '',
+    source: opts.source || ''
+  };
+  try{
+    if(todayRec?.id){
+      const {data} = await pb.update('daily_tasks', todayRec.id, payload);
+      if(data) todayRec = data;
+    } else {
+      const {data} = await pb.insert('daily_tasks', payload);
+      if(data) todayRec = data;
+    }
+  }catch(e){ console.error('Не удалось сохранить задания дня:', e); }
 }
+
+// Стабильные id: привязаны к дате и номеру слота, а не ко времени генерации.
+// Раньше id менялись при каждой генерации — и выполненное задание переставало узнаваться.
+function taskId(slot){ return getLocalDateStr()+'_'+slot; }
 
 // Хэш из языков любви + языка дня — если поменялся, задания устарели
 function makeLangHash(ql, prefLang, remTask, remote) {
   const top = (ql||[]).slice(0,2).map(l=>l.lang).join(',');
   const r = (remote===undefined) ? (typeof hRemoteMode!=='undefined' && hRemoteMode) : remote;
   return top + '|' + (prefLang||'') + '|' + (remTask||'') + '|' + (r ? 'away' : 'home');
-}
-function loadTodayTasksLocally() {
-  try {
-    const raw=localStorage.getItem(getTodayTasksKey());
-    if(!raw) return null;
-    const payload=JSON.parse(raw);
-    const today=getLocalDateStr();
-    if(payload.date!==today) return null;
-    return payload; // {tasks, wishApplied, remoteMode, date}
-  } catch(e){return null;}
 }
 
 async function loadHusbandData(){
@@ -1779,72 +1998,88 @@ async function loadHusbandData(){
 
   const doneIds=new Set((todayC||[]).map(c=>c.task_ref));
 
-  // Check if we already have tasks for today saved locally
-  const saved = loadTodayTasksLocally();
+  // Время последнего выполнения — с сервера (localStorage телефон чистит)
+  lastCompletionServer = (todayC||[]).reduce((mx,c)=>{
+    const t = c.completed_at ? Date.parse(c.completed_at) : 0;
+    return (t && t>mx) ? t : mx;
+  }, 0);
+
+  // Задания дня берём с СЕРВЕРА — они одни для всех устройств и не теряются
+  const saved = await loadTodayTasks();
   hRemoteMode = loadRemoteMode() || saved?.remoteMode || false;
   updateRemoteToggle();
+  if(saved?.ctx) lastAiCtx = saved.ctx;
 
-  // Текущий хэш входных данных — если поменялся, задания нужно перегенерировать
   const currentLangHash = makeLangHash(ql, prefLang, remData?.[0]?.task||'');
   const savedLangHash = saved?.langHash || '';
 
-  // Нужна ли перегенерация невыполненных заданий?
+  // Перегенерация нужна, только если изменились входные данные (пожелание/языки/режим).
+  // Просто повторный вход в приложение НИКОГДА не перегенерирует задания.
   const langChanged = saved && savedLangHash !== currentLangHash;
   const wishAddedLater = saved && wifeReminder && !saved.wishApplied;
-  const needsRegen = (langChanged || wishAddedLater) && !hRemoteMode;
+  const needsRegen = langChanged || wishAddedLater;
 
-  if(saved && saved.tasks && saved.tasks.length && !needsRegen){
-    // Задания актуальны — просто обновляем статус выполнения
+  if(saved && saved.tasks.length && !needsRegen){
+    // Задания на сегодня уже есть — просто отмечаем выполненные
     hTasks = saved.tasks.map(t=>({...t, done: doneIds.has(t.id)}));
-  } else if(saved && saved.tasks && saved.tasks.length && needsRegen){
-    // Входные данные изменились — перегенерируем только невыполненные
+
+  } else if(saved && saved.tasks.length && needsRegen){
+    // Входные данные изменились: ВЫПОЛНЕННЫЕ остаются, меняем только невыполненные
     const doneTasks = saved.tasks.filter(t => doneIds.has(t.id));
-    const needed = 3 - doneTasks.length;
+    const freeSlots = saved.tasks.filter(t => !doneIds.has(t.id)).map(t => t.id);
+    const needed = freeSlots.length;
+
     if(needed > 0){
-      const reason = langChanged ? 'Языки любви обновились' : 'Жена оставила пожелание';
+      const reason = langChanged ? 'Пожелание обновилось' : 'Жена оставила пожелание';
       loading(true, reason + ' — обновляем задания...');
       const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
       loading(false);
+
+      let newUndone;
       if(aiTasks && aiTasks.length){
-        // Берём нужное кол-во новых заданий, не дублируя категории выполненных
         const usedCats = new Set(doneTasks.map(t=>t.category));
-        const fresh = aiTasks.filter(t=>!usedCats.has(t.category)).slice(0, needed);
-        const fill = aiTasks.filter(t=>usedCats.has(t.category));
-        const newUndone = [...fresh, ...fill].slice(0, needed);
-        hTasks = [...doneTasks, ...newUndone].map(t=>({...t, done: doneIds.has(t.id)}));
+        const fresh = aiTasks.filter(t=>!usedCats.has(t.category));
+        const rest  = aiTasks.filter(t=>usedCats.has(t.category));
+        newUndone = [...fresh, ...rest].slice(0, needed);
       } else {
-        hTasks = saved.tasks.map(t=>({...t, done: doneIds.has(t.id)}));
+        newUndone = (hRemoteMode ? getRemoteTasks() : genTasks(prefLang, ql||[], remData||[], false)).slice(0, needed);
       }
-      saveTodayTasksLocally(hTasks, true, false, currentLangHash);
-      if(langChanged) toast('💕 Задания обновлены — языки любви изменились!');
-      else toast('💜 Задания обновлены по пожеланию жены!');
+      // Новые задания занимают освободившиеся слоты — id сохраняются стабильными
+      newUndone = newUndone.map((t,idx)=>({...t, id: freeSlots[idx], done:false}));
+
+      hTasks = [...doneTasks.map(t=>({...t, done:true})), ...newUndone];
+      await saveTodayTasks(hTasks, {
+        wishApplied: !!wifeReminder, remoteMode: hRemoteMode, langHash: currentLangHash,
+        wishText: wifeReminder||'', source: (aiTasks&&aiTasks.length)?'ai':'fallback'
+      });
+      toast('💜 Задания обновлены');
     } else {
-      hTasks = saved.tasks.map(t=>({...t, done: doneIds.has(t.id)}));
+      hTasks = saved.tasks.map(t=>({...t, done:true}));
     }
+
   } else {
-    // Нет сохранённых заданий — генерируем новые
-    if(hRemoteMode){
-      hTasks = getRemoteTasks();
-      saveTodayTasksLocally(hTasks, false, true, currentLangHash);
-    } else {
-      const aiCard = document.getElementById('ai-gen-card');
-      aiCard.classList.add('show');
-      loading(false);
-      const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
-      aiCard.classList.remove('show');
-      if(aiTasks && aiTasks.length){
-        hTasks = aiTasks.map(t=>({...t, done: doneIds.has(t.id)}));
-      } else {
-        hTasks = (hRemoteMode ? getRemoteTasks() : genTasks(prefLang, ql||[], remData||[], false)).map(t=>({...t, done: doneIds.has(t.id)}));
-      }
-      saveTodayTasksLocally(hTasks, !!wifeReminder, false, currentLangHash);
-    }
+    // Первый вход за сегодня — генерируем задания один раз на сутки
+    const aiCard = document.getElementById('ai-gen-card');
+    aiCard.classList.add('show');
+    loading(false);
+    const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
+    aiCard.classList.remove('show');
+
+    const base = (aiTasks && aiTasks.length)
+      ? aiTasks
+      : (hRemoteMode ? getRemoteTasks() : genTasks(prefLang, ql||[], remData||[], false));
+
+    hTasks = base.slice(0,3).map((t,idx)=>({...t, id: taskId(idx), done: false}));
+    await saveTodayTasks(hTasks, {
+      wishApplied: !!wifeReminder, remoteMode: hRemoteMode, langHash: currentLangHash,
+      wishText: wifeReminder||'', source: (aiTasks&&aiTasks.length)?'ai':'fallback'
+    });
   }
 
   // ── Баннер "Сегодня ей важно" — показываем ПЕРЕВОД, а не слова жены дословно ──
   if(wifeReminder){
     // Приоритет: свежий перевод от AI → сохранённый перевод → (если AI недоступен) ничего
-    const ctxLine = lastAiCtx || loadTodayTasksLocally()?.ctx || '';
+    const ctxLine = lastAiCtx || '';
     if(ctxLine){
       const banner=document.getElementById('wife-wishes-banner');
       const langLabel = prefLang ? (LANG_META[prefLang]?.emoji||'') + ' ' + (LANG_META[prefLang]?.name||prefLang) : '';
@@ -1948,7 +2183,8 @@ async function completeTask(i){
 
   hTasks[i].done=true;
   setLastCompletionTime(); // Запускаем кулдаун
-  saveTodayTasksLocally(hTasks, true, hRemoteMode); // Обновляем localStorage
+  lastCompletionServer = Date.now();
+  // Задания не перезаписываем: "выполнено" определяется по коллекции completions на сервере
 
   setTimeout(()=>{
     renderTasks();
@@ -1983,16 +2219,20 @@ async function completeTask(i){
 
 // ── REMOTE MODE ───────────────────────────────────────
 function updateRemoteToggle(){
-  const btn=document.getElementById('remote-toggle');
+  const wrap=document.querySelector('.sw-wrap');
+  const txt=document.getElementById('sw-text');
+  const knob=document.getElementById('sw-knob');
   const banner=document.getElementById('remote-mode-banner');
-  if(!btn) return;
+  if(!wrap||!txt||!knob) return;
   if(hRemoteMode){
-    btn.textContent='✈️ Мы не рядом';
-    btn.classList.add('remote-on');
+    wrap.classList.add('away');
+    txt.textContent='Мы не рядом';
+    knob.textContent='✈️';
     if(banner) banner.style.display='block';
   } else {
-    btn.textContent='🏠 Мы рядом';
-    btn.classList.remove('remote-on');
+    wrap.classList.remove('away');
+    txt.textContent='Мы рядом';
+    knob.textContent='🏠';
     if(banner) banner.style.display='none';
   }
 }
@@ -2049,7 +2289,11 @@ async function toggleRemoteMode(){
   }
 
   const curHash = makeLangHash(ql||[], prefLang, wifeReminder);
-  saveTodayTasksLocally(hTasks, !!wifeReminder, hRemoteMode, curHash);
+  hTasks = hTasks.map((t,idx)=>({...t, id: t.id || taskId(idx)}));
+  await saveTodayTasks(hTasks, {
+    wishApplied: !!wifeReminder, remoteMode: hRemoteMode, langHash: curHash,
+    wishText: wifeReminder||'', source: (aiTasks&&aiTasks.length)?'ai':'fallback'
+  });
   toast(hRemoteMode ? '✈️ Вы не рядом — задания на расстоянии' : '🏠 Вы снова вместе — задания обновлены');
   renderTasks();
 }
