@@ -326,7 +326,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-title">💜 LoveTracker</div>
     <div class="topbar-right">
       <span id="w-code-top" style="font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:700"></span>
-      <button class="bic" onclick="invitePair()" title="Пригласить пару">🔗</button>
       <button class="bic" onclick="showOnboarding(true)" title="Как это работает">?</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
@@ -451,7 +450,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <span class="sw-lbl" id="sw-text">Мы рядом</span>
         <span class="sw-track" id="sw-track"><span class="sw-knob" id="sw-knob">🏠</span></span>
       </div>
-      <button class="bic" onclick="invitePair()" title="Пригласить пару">🔗</button>
       <button class="bic" onclick="showOnboarding(true)" title="Как это работает">?</button>
       <button class="bic" onclick="logout()">🚪</button>
     </div>
@@ -1484,18 +1482,18 @@ async function invitePair(){
   const url = 'https://valeriyamylnikova.github.io/love-tracker/';
   const text = 'Мы пробуем LoveTracker — маленькие шаги навстречу друг другу каждый день 💜 Попробуйте вдвоём: сначала регистрируется она и получает код пары, потом он входит по этому коду.';
   const full = text + '\n\n' + url;
-  // На телефоне — системное меню "Поделиться"
-  if(navigator.share){
+  // Системное "Поделиться" — только на телефоне/планшете (сенсорный экран).
+  // На компьютере navigator.share ведёт себя криво, поэтому там всегда копируем в буфер.
+  const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  if(isTouch && navigator.share){
     try{ await navigator.share({title:'LoveTracker', text:text, url:url}); return; }
     catch(e){ if(e.name==='AbortError') return; }
   }
-  // На компьютере — копируем в буфер
   try{
     await navigator.clipboard.writeText(full);
-    toast('🔗 Приглашение скопировано — вставьте в мессенджер');
+    toast('✅ Приглашение скопировано — вставьте в любой мессенджер');
   }catch(e){
-    // Совсем запасной вариант
-    prompt('Скопируйте приглашение:', full);
+    prompt('Скопируйте приглашение и отправьте другой паре:', full);
   }
 }
 
