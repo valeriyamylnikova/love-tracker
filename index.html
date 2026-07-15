@@ -2298,7 +2298,6 @@ async function toggleRemoteMode(){
   saveRemoteMode(hRemoteMode);  // запоминаем надолго, не только на сегодня
 
   const today=getLocalDateStr();
-  const doneTasksToKeep = hTasks.filter(t=>t.done);
 
   // В ОБОИХ режимах задания генерирует AI — просто с разным контекстом
   const [
@@ -2320,22 +2319,21 @@ async function toggleRemoteMode(){
   const aiTasks = await generateTasksWithAI(ql||[], prefLang, wifeWish, remData||[], hRemoteMode);
   aiCard.classList.remove('show');
 
-  // Если AI недоступен — запасной вариант под текущий режим
-  const newTasks = aiTasks?.length
-    ? aiTasks.map(t=>({...t,done:false}))
-    : (hRemoteMode
-        ? getRemoteTasks().map(t=>({...t,done:false}))
-        : genTasks(prefLang,ql||[],remData||[],false).map(t=>({...t,done:false})));
+  // Выполненные задания оставляем КАК ЕСТЬ — с их текстом и родным id (слотом).
+  // Иначе "выполнено" (привязано к task_ref в базе) теряет свою карточку.
+  const doneKeep = hTasks.filter(t=>t.done);
+  const freeSlots = hTasks.filter(t=>!t.done).map(t=>t.id);  // освободившиеся слоты
 
-  if(doneTasksToKeep.length > 0){
-    const needed = 3 - doneTasksToKeep.length;
-    hTasks = [...doneTasksToKeep, ...newTasks.slice(0, needed)];
-  } else {
-    hTasks = newTasks;
-  }
+  // Новые задания занимают только свободные слоты, не трогая выполненные
+  let newUndone = (aiTasks?.length
+      ? aiTasks
+      : (hRemoteMode ? getRemoteTasks() : genTasks(prefLang,ql||[],remData||[],false))
+    ).slice(0, freeSlots.length)
+     .map((t,idx)=>({...t, id: freeSlots[idx], done:false}));
+
+  hTasks = [...doneKeep.map(t=>({...t,done:true})), ...newUndone];
 
   const curHash = makeLangHash(ql||[], prefLang, wifeReminder);
-  hTasks = hTasks.map((t,idx)=>({...t, id: t.id || taskId(idx)}));
   await saveTodayTasks(hTasks, {
     wishApplied: !!wifeReminder, remoteMode: hRemoteMode, langHash: curHash,
     wishText: wifeReminder||'', source: (aiTasks&&aiTasks.length)?'ai':'fallback'
