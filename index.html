@@ -124,16 +124,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .sn{font-size:16px;font-weight:700;color:var(--gold)}
 .task-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;transition:all .3s;position:relative;overflow:hidden}
 .task-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);border-radius:4px 0 0 4px}
-.task-card.done::before{background:var(--green)}.task-card.done{opacity:.65}
+.task-card.done::before{background:var(--green)}.task-card.done{opacity:.9;border-color:var(--green)}
 .task-card.locked::before{background:var(--text3)}
 #remote-toggle.remote-on{color:var(--blue)!important;background:rgba(96,168,232,.15);border-radius:8px;padding:4px 6px}
 .tcat{font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
 .ttxt{font-size:15px;color:var(--text);line-height:1.5;margin-bottom:12px}
 .tmot{font-size:13px;color:var(--accent2);font-style:italic;margin-bottom:14px;line-height:1.4}
 .tmot::before{content:'"'}.tmot::after{content:'"'}
-.bdone{width:100%;padding:13px;background:linear-gradient(135deg,var(--green),#4a9f6a);border:none;border-radius:var(--rsm);color:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.btodo{width:100%;padding:14px;background:transparent;border:2px solid var(--green);border-radius:var(--rsm);color:var(--green);font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.btodo:hover{background:var(--green);color:#fff}
+.btodo:disabled{border-color:var(--bg3);background:var(--bg3);color:var(--text3);cursor:default}
 .bdone:disabled{background:var(--bg3);color:var(--text3);cursor:default}
-.done-check{display:flex;align-items:center;gap:8px;color:var(--green);font-size:14px;font-weight:600}
+.done-check{display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;background:linear-gradient(135deg,var(--green),#4a9f6a);padding:12px;border-radius:var(--rsm);font-size:14px;font-weight:700;margin-top:4px}
 .locked-msg{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:13px;background:var(--bg3);border-radius:var(--rsm);padding:10px 14px}
 .all-done-banner{background:linear-gradient(135deg,#1a3025,#0f2018);border:1px solid var(--green);border-radius:var(--radius);padding:24px;text-align:center;margin-top:10px}
 .adb-big{font-size:48px;display:block;margin-bottom:8px}
@@ -2141,7 +2143,7 @@ function renderTasks(){
       <div class="tcat">${CAT_LABELS[t.category]||'📋 Задание'}</div>
       <div class="ttxt">${t.t}</div>
       <div class="tmot">${t.m}</div>
-      <button class="bdone" onclick="completeTask(${i})">Сделано</button>
+      <button class="btodo" onclick="completeTask(${i})">Отметить, что сделал ✓</button>
     </div>`;
   }).join('');
 
@@ -2161,7 +2163,8 @@ async function completeTask(i){
     return;
   }
 
-  const btn=document.querySelector(`#tc-${i} .bdone`);if(btn){btn.disabled=true;btn.textContent='...'}
+  const btn=document.querySelector(`#tc-${i} .btodo`);
+  if(btn){btn.disabled=true;btn.textContent='Сохраняю...';}
   const card=document.getElementById('tc-'+i);
   if(card){card.classList.add('completing')}
 
@@ -2169,7 +2172,7 @@ async function completeTask(i){
   const {error:insErr}=await pb.insert('completions',{user_id:CU.id,task_ref:task.id,task_text:task.t,task_cat:task.category,couple_id:CP.couple_id,completed_at:new Date().toISOString()});
   if(insErr){
     // Ничего не сохранилось — откатываем UI и не начисляем очки
-    if(btn){btn.disabled=false;btn.textContent='Сделано'}
+    if(btn){btn.disabled=false;btn.textContent='Отметить, что сделал ✓'}
     if(card){card.classList.remove('completing')}
     toast('⚠️ Не удалось сохранить — проверь соединение');
     return;
@@ -2186,8 +2189,8 @@ async function completeTask(i){
   lastCompletionServer = Date.now();
   // Задания не перезаписываем: "выполнено" определяется по коллекции completions на сервере
 
+  renderTasks();  // сразу показываем карточку выполненной
   setTimeout(()=>{
-    renderTasks();
     launchConfetti(28);
     toast('💪 Сделал — такие моменты меняют отношения');
     if(hTasks.every(t=>t.done)){
