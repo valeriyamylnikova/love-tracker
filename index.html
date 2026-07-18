@@ -150,6 +150,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .unlock-prog{margin-top:14px;font-size:12px;color:var(--text3);letter-spacing:.3px}
 .unlock-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:8px;overflow:hidden}
 .unlock-fill{height:100%;background:linear-gradient(90deg,var(--purple),#c77dff);transition:width .4s}
+.unlock-fill.done{background:linear-gradient(90deg,var(--green),#6fc48d)}
+.unlock-row{margin-top:12px}
 
 /* ONBOARDING */
 .onb-back{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
@@ -2169,7 +2171,16 @@ function renderUnlockCard(streak, totalDone){
   const ready = streak >= UNLOCK_STREAK && totalDone >= UNLOCK_TOTAL;
   const pctS = Math.min(100, (streak/UNLOCK_STREAK)*100);
   const pctT = Math.min(100, (totalDone/UNLOCK_TOTAL)*100);
-  const pct  = Math.round((pctS + pctT) / 2);
+  const doneS = streak >= UNLOCK_STREAK;
+  const doneT = totalDone >= UNLOCK_TOTAL;
+
+  // Две отдельные шкалы: усреднение вводило в заблуждение
+  // (15 действий из 15 давали половину полосы при нулевом стрике)
+  const row = (label, cur, max, pct, isDone) => `
+    <div class="unlock-row">
+      <div class="unlock-prog">${isDone ? '✓ ' : ''}${label}: ${Math.min(cur,max)} из ${max}</div>
+      <div class="unlock-bar"><div class="unlock-fill${isDone?' done':''}" style="width:${pct}%"></div></div>
+    </div>`;
 
   const html = ready ? `
     <div class="unlock-box ready">
@@ -2179,8 +2190,8 @@ function renderUnlockCard(streak, totalDone){
     <div class="unlock-box">
       <div class="unlock-head">🔒 Скоро откроется</div>
       <div class="unlock-txt">Когда контакт станет устойчивым, заработает и обратное направление: ты сможешь рассказать, что важно тебе, — а она получит это на своём языке, без требований и торга.</div>
-      <div class="unlock-prog">Форма набирается: ${Math.min(streak,UNLOCK_STREAK)} из ${UNLOCK_STREAK} дней подряд · ${Math.min(totalDone,UNLOCK_TOTAL)} из ${UNLOCK_TOTAL} действий</div>
-      <div class="unlock-bar"><div class="unlock-fill" style="width:${pct}%"></div></div>
+      ${row('Дней подряд', streak, UNLOCK_STREAK, pctS, doneS)}
+      ${row('Действий', totalDone, UNLOCK_TOTAL, pctT, doneT)}
     </div>`;
 
   const a=document.getElementById('unlock-today');
