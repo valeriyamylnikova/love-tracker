@@ -140,6 +140,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .all-done-banner{background:linear-gradient(135deg,#1a3025,#0f2018);border:1px solid var(--green);border-radius:var(--radius);padding:24px;text-align:center;margin-top:10px}
 .adb-big{font-size:48px;display:block;margin-bottom:8px}
 
+/* UNLOCK CARD — обратное направление (муж → жена) */
+.unlock-card{margin-top:16px}
+.unlock-box{background:linear-gradient(135deg,#1a1030,#0f0a20);border:1px solid rgba(160,96,232,.3);border-radius:var(--radius);padding:20px}
+.unlock-box.ready{border-color:var(--green);background:linear-gradient(135deg,#10251a,#0b1a12)}
+.unlock-head{font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--purple);margin-bottom:10px}
+.unlock-box.ready .unlock-head{color:var(--green)}
+.unlock-txt{font-size:14px;line-height:1.6;color:var(--text2)}
+.unlock-prog{margin-top:14px;font-size:12px;color:var(--text3);letter-spacing:.3px}
+.unlock-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:8px;overflow:hidden}
+.unlock-fill{height:100%;background:linear-gradient(90deg,var(--purple),#c77dff);transition:width .4s}
+
 /* ONBOARDING */
 .onb-back{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .onb-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:26px 22px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto}
@@ -497,6 +508,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <p style="color:var(--green);font-weight:600;font-size:16px">Сегодня ты выбрал быть лучше</p>
         <p style="color:var(--text3);font-size:13px;margin-top:6px">Такие моменты и строят настоящие отношения</p>
       </div>
+      <div class="unlock-card" id="unlock-today"></div>
     </div>
     <div class="tpanel" id="hp-streak">
       <div class="sec-title">Ты держишь темп</div>
@@ -515,6 +527,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div class="sec-title">Ты не просто стараешься — ты растёшь</div>
       <div class="sec-sub">Постоянная забота — это уже другой уровень отношений</div>
       <div id="rewards-list"></div>
+      <div class="unlock-card" id="unlock-rewards"></div>
     </div>
   </div>
 </div>
@@ -1479,7 +1492,7 @@ async function noticeAnswer(ans){
 
 // ── ПРИГЛАСИТЬ ПАРУ ──────────────────────────────────
 async function invitePair(){
-  const url = 'https://valeriyamylnikova.github.io/love-tracker/';
+  const url = 'https://lovetracker.ru';
   const text = 'Мы пробуем LoveTracker — маленькие шаги навстречу друг другу каждый день 💜 Попробуйте вдвоём: сначала регистрируется она и получает код пары, потом он входит по этому коду.';
   const full = text + '\n\n' + url;
   // Системное "Поделиться" — только на телефоне/планшете (сенсорный экран).
@@ -2139,8 +2152,41 @@ async function loadHusbandData(){
   document.getElementById('h-st-bar').style.width=Math.min(100,(hStreak/30)*100)+'%';
 
   updateTitleDisplay();
+  renderUnlockCard(hStreak, (allC||[]).length);
   renderTasks();
   loading(false);
+}
+
+
+// ── ОБРАТНОЕ НАПРАВЛЕНИЕ (муж → жена): условия открытия ──
+// Открывается по КОМБИНАЦИИ: 7 дней подряд И 15+ выполненных действий.
+// Формулировки намеренно мягкие: это не награда за очки, а признак
+// того, что контакт устойчивый и обратный перевод имеет смысл.
+const UNLOCK_STREAK = 7;
+const UNLOCK_TOTAL  = 15;
+
+function renderUnlockCard(streak, totalDone){
+  const ready = streak >= UNLOCK_STREAK && totalDone >= UNLOCK_TOTAL;
+  const pctS = Math.min(100, (streak/UNLOCK_STREAK)*100);
+  const pctT = Math.min(100, (totalDone/UNLOCK_TOTAL)*100);
+  const pct  = Math.round((pctS + pctT) / 2);
+
+  const html = ready ? `
+    <div class="unlock-box ready">
+      <div class="unlock-head">✅ Открыто</div>
+      <div class="unlock-txt">Контакт устойчивый — теперь работает и обратное направление. Ты сможешь рассказать, что важно тебе, и она получит это на своём языке: без требований и без торга.<br><br><span style="color:var(--text3)">Появится в ближайшем обновлении.</span></div>
+    </div>` : `
+    <div class="unlock-box">
+      <div class="unlock-head">🔒 Скоро откроется</div>
+      <div class="unlock-txt">Когда контакт станет устойчивым, заработает и обратное направление: ты сможешь рассказать, что важно тебе, — а она получит это на своём языке, без требований и торга.</div>
+      <div class="unlock-prog">Форма набирается: ${Math.min(streak,UNLOCK_STREAK)} из ${UNLOCK_STREAK} дней подряд · ${Math.min(totalDone,UNLOCK_TOTAL)} из ${UNLOCK_TOTAL} действий</div>
+      <div class="unlock-bar"><div class="unlock-fill" style="width:${pct}%"></div></div>
+    </div>`;
+
+  const a=document.getElementById('unlock-today');
+  const b=document.getElementById('unlock-rewards');
+  if(a) a.innerHTML=html;
+  if(b) b.innerHTML=html;
 }
 
 function updateTitleDisplay(){
@@ -2247,6 +2293,7 @@ async function completeTask(i){
 
   const {data:allC}=await pb.getList('completions',`user_id="${CU.id}"`,'completed_at');
   const newStreak=calcStreak(allC||[]);
+  renderUnlockCard(Math.max(newStreak,hStreak), (allC||[]).length);
   if(newStreak > hStreak){
     hStreak=newStreak;
     document.getElementById('h-st').textContent=hStreak;
