@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LoveTracker — он начнёт понимать без объяснений</title>
+<meta name="description" content="Ты рассказываешь своими словами, что тебе сейчас важно. Он получает три понятных ему шага на день. Твоих слов он не увидит.">
+<meta property="og:title" content="LoveTracker — он начнёт понимать без объяснений">
+<meta property="og:description" content="Ты рассказываешь своими словами, что тебе важно. Он получает три понятных ему шага на день.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lovetracker.ru/start">
+<meta name="theme-color" content="#0f0a0a">
+<link rel="canonical" href="https://lovetracker.ru/start">
+<style>
+:root{
+  --bg:#0f0a0a; --bg2:#1a1010; --bg3:#241518; --card:#1e1212;
+  --border:#3d2020; --accent:#e8604a; --accent2:#f0a070;
+  --gold:#d4a853; --gold2:#f0c878; --text:#f5ede8;
+  --text2:#c4a898; --text3:#8a6860; --green:#6dbf8a;
+  --radius:16px; --rsm:10px;
+  --font-display: Georgia, 'Times New Roman', 'Palatino Linotype', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --wrap:660px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-body);
+  font-size:17px; line-height:1.6; overflow-x:hidden;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,96,74,.13), transparent 70%);
+  background-repeat:no-repeat;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 22px}
+section{padding:64px 0}
+h1,h2,h3{font-family:var(--font-display);font-weight:normal;line-height:1.2}
+h1{font-size:clamp(31px,7.4vw,46px);letter-spacing:-.5px}
+h2{font-size:clamp(25px,5.4vw,33px);margin-bottom:20px}
+h3{font-size:20px;margin-bottom:7px}
+p{color:var(--text2)}
+.eyebrow{
+  font-size:12px;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--text3);margin-bottom:14px;font-weight:600
+}
+.accent{color:var(--accent2)}
+
+/* ---------- hero ---------- */
+.hero{padding:56px 0 20px;text-align:center}
+.logo{
+  font-family:var(--font-display);font-size:19px;letter-spacing:.5px;
+  color:var(--gold);margin-bottom:44px;display:inline-block
+}
+.hero h1{margin-bottom:16px}
+.hero .sub{font-size:18px;max-width:480px;margin:0 auto}
+
+/* ---------- signature: translator ---------- */
+.tr{margin:40px 0 8px}
+.tr-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 20px 22px;text-align:left;position:relative
+}
+.tr-card + .tr-card{margin-top:0}
+.tr-lbl{
+  font-size:12px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--text3);margin-bottom:10px;font-weight:600
+}
+.tr-her{font-family:var(--font-display);font-size:19px;line-height:1.45;color:var(--text)}
+.tr-arrow{
+  height:46px;display:flex;align-items:center;justify-content:center;
+  color:var(--text3);font-size:12px;letter-spacing:1.4px;text-transform:uppercase;gap:9px
+}
+.tr-arrow span{color:var(--accent);font-size:16px}
+.tr-his{border-color:#4a2a1c;background:linear-gradient(180deg,#221410,#1c1110)}
+.tr-task{display:flex;gap:11px;align-items:flex-start;font-size:16px;color:var(--text)}
+.tr-task + .tr-task{margin-top:12px}
+.tr-task i{color:var(--gold);font-style:normal;flex-shrink:0;margin-top:1px}
+.fade{transition:opacity .32s ease}
+.fade.out{opacity:0}
+.tr-dots{display:flex;gap:7px;justify-content:center;margin-top:20px}
+.tr-dots button{
+  width:7px;height:7px;border-radius:50%;border:0;padding:0;cursor:pointer;
+  background:var(--border);transition:background .25s
+}
+.tr-dots button[aria-current="true"]{background:var(--accent)}
+.tr-note{
+  text-align:center;font-size:14px;color:var(--text3);margin-top:16px;
+  max-width:400px;margin-left:auto;margin-right:auto
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+  padding:15px 32px;border-radius:var(--radius);font-size:17px;font-weight:600;
+  border:0;cursor:pointer;font-family:var(--font-body);
+  box-shadow:0 6px 22px rgba(232,96,74,.24);transition:transform .15s,box-shadow .15s
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 9px 26px rgba(232,96,74,.32)}
+.btn:active{transform:translateY(0)}
+.btn-wide{display:block;width:100%;text-align:center}
+.btn-ghost{
+  background:transparent;border:1px solid var(--border);color:var(--text2);
+  box-shadow:none;font-weight:500;font-size:15px;padding:13px 26px
+}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text);transform:none;box-shadow:none}
+.cta-block{text-align:center;padding-top:8px}
+.cta-note{font-size:14px;color:var(--text3);margin-top:14px}
+
+/* ---------- steps ---------- */
+.step{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:0}
+.step-n{
+  font-family:var(--font-display);font-size:26px;color:var(--accent);
+  line-height:1;flex-shrink:0;width:26px;padding-top:2px
+}
+.step p{font-size:16px}
+
+/* ---------- privacy ---------- */
+.privacy{background:var(--bg2);border-radius:var(--radius);padding:28px 24px;border:1px solid var(--border)}
+.pr-row{display:flex;gap:12px;align-items:flex-start;font-size:16px;color:var(--text2)}
+.pr-row + .pr-row{margin-top:14px}
+.pr-row i{font-style:normal;flex-shrink:0;font-size:15px;margin-top:2px}
+.pr-yes i{color:var(--green)}
+.pr-no i{color:var(--text3)}
+
+/* ---------- his side ---------- */
+.his{background:var(--bg3);border-radius:var(--radius);padding:28px 24px;border:1px solid var(--border)}
+.his h2{margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.chip{
+  background:rgba(212,168,83,.1);border:1px solid rgba(212,168,83,.3);
+  color:var(--gold2);border-radius:999px;padding:7px 14px;font-size:14px
+}
+
+/* ---------- invite ---------- */
+.invite-box{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-top:18px
+}
+.invite-text{font-size:16px;color:var(--text);line-height:1.55}
+.copy-btn{margin-top:16px}
+.copied{color:var(--green);font-size:14px;margin-top:10px;display:none}
+
+/* ---------- faq ---------- */
+details{border-bottom:1px solid var(--border);padding:17px 0}
+details:last-of-type{border-bottom:0}
+summary{
+  cursor:pointer;font-size:17px;color:var(--text);list-style:none;
+  display:flex;justify-content:space-between;gap:14px;align-items:center
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';color:var(--accent);font-size:20px;flex-shrink:0}
+details[open] summary::after{content:'–'}
+details p{margin-top:11px;font-size:16px}
+
+/* ---------- footer ---------- */
+footer{padding:40px 0 56px;border-top:1px solid var(--border);text-align:center}
+footer a{color:var(--text3);text-decoration:none;font-size:14px;margin:0 10px}
+footer a:hover{color:var(--text2)}
+.foot-note{font-size:13px;color:var(--text3);margin-top:16px}
+
+:focus-visible{outline:2px solid var(--accent2);outline-offset:3px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+@media (max-width:420px){
+  section{padding:52px 0}
+  .tr-card{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO + СИГНАТУРНЫЙ БЛОК ============ -->
+<header class="wrap hero">
+  <div class="logo">LoveTracker</div>
+  <h1>Он не догадывается.<br>Не потому что <span class="accent">не любит</span>.</h1>
+  <p class="sub">Просто вы говорите на разных языках. Ты рассказываешь своими словами, что тебе сейчас важно — он получает три понятных ему шага на день.</p>
+
+  <div class="tr">
+    <div class="tr-card">
+      <div class="tr-lbl">Ты написала</div>
+      <div class="tr-her fade" id="her">Я устала быть той, кто всё помнит и всё тащит. Хочется хоть иногда просто выдохнуть.</div>
+    </div>
+
+    <div class="tr-arrow"><span>↓</span> он видит</div>
+
+    <div class="tr-card tr-his">
+      <div class="tr-lbl">Его день</div>
+      <div class="fade" id="his"></div>
+    </div>
+
+    <div class="tr-dots" id="dots" role="tablist" aria-label="Примеры"></div>
+  </div>
+
+  <p class="tr-note">Это настоящие примеры того, как приложение переводит. Твоих слов он не увидит — ни целиком, ни цитатой.</p>
+</header>
+
+<!-- ============ КАК ЭТО РАБОТАЕТ ============ -->
+<section class="wrap">
+  <div class="eyebrow">Как это устроено</div>
+  <h2>Три минуты в день с твоей стороны</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <h3>Ты говоришь как есть</h3>
+      <p>Без формулировок и списков претензий. Одно поле, свои слова, когда захочется. Можно вообще ничего не писать — приложение подхватит то, что ты отмечала раньше.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <h3>Он получает конкретику</h3>
+      <p>Три коротких действия на день, в том виде, в котором мужчина их слышит: как выбор и как вызов, а не как упрёк и не как список дел от жены.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <h3>Ты видишь, что меняется</h3>
+      <p>Не отчёт о его послушании, а спокойная картина: в какие дни между вами было теплее и что этому предшествовало.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ГЛАВНОЕ ВОЗРАЖЕНИЕ ============ -->
+<section class="wrap">
+  <div class="privacy">
+    <h2>Он не узнает, что ты жаловалась</h2>
+    <p style="margin-bottom:20px">Потому что жалоб не будет. Приложение — это переводчик, а не пересказчик.</p>
+
+    <div class="pr-row pr-no"><i>✕</i><div>Он не видит твой текст</div></div>
+    <div class="pr-row pr-no"><i>✕</i><div>Он не видит цитат и обрывков фраз</div></div>
+    <div class="pr-row pr-no"><i>✕</i><div>Ему не приходит ничего в духе «она сказала, что ты…»</div></div>
+    <div class="pr-row pr-yes"><i>✓</i><div>Он видит только действия и короткую подсказку, зачем это сегодня</div></div>
+    <div class="pr-row pr-yes"><i>✓</i><div>Ты в любой момент видишь ровно то, что видит он</div></div>
+  </div>
+</section>
+
+<!-- ============ ЕГО СТОРОНА ============ -->
+<section class="wrap">
+  <div class="his">
+    <div class="eyebrow">С его стороны</div>
+    <h2>Ему это не про «надо»</h2>
+    <p>Мужчине приходит не задание от жены, а личный прогресс: серия дней подряд, уровни, статусы. Тот же механизм, что держит его в спортзале и в играх — только результат достаётся вам обоим.</p>
+    <div class="chips">
+      <span class="chip">7 дней подряд</span>
+      <span class="chip">Уровень: Надёжный</span>
+      <span class="chip">15 действий</span>
+      <span class="chip">Серия не прервана 🔥</span>
+    </div>
+    <p style="margin-top:20px;font-size:15px">Поэтому мужчины и не бросают на третий день: они соревнуются не с тобой, а с собой вчерашним.</p>
+  </div>
+</section>
+
+<!-- ============ ПРИГЛАШЕНИЕ ============ -->
+<section class="wrap">
+  <div class="eyebrow">Самое сложное</div>
+  <h2>Как позвать его, чтобы он согласился</h2>
+  <p>Ты регистрируешься первой и получаешь код пары. Дальше нужно отправить ему одно сообщение — и вот оно, можешь просто скопировать:</p>
+
+  <div class="invite-box">
+    <div class="invite-text" id="inviteText">Слушай, скачала штуку — там тебе раз в день приходит пара идей, что сделать. Мне интересно, попробуешь со мной недельку? Просто ради эксперимента 🙂</div>
+    <button class="btn btn-ghost btn-wide copy-btn" id="copyBtn">Скопировать текст</button>
+    <div class="copied" id="copied">Скопировано — можно вставлять в переписку</div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="wrap cta-block">
+  <h2>Попробуйте неделю</h2>
+  <p style="max-width:420px;margin:0 auto 26px">Если через семь дней ничего не изменится — просто удалите. Но обычно первое «он сам заметил» случается на второй-третий день.</p>
+  <a class="btn" href="/" id="ctaMain">Начать бесплатно</a>
+  <div class="cta-note">Без карты. Регистрация занимает минуту.</div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="wrap">
+  <h2>Короткие ответы</h2>
+
+  <details>
+    <summary>Это бесплатно?</summary>
+    <p>Да, сейчас полностью. Приложение молодое, и первым парам доступ останется бесплатным навсегда.</p>
+  </details>
+
+  <details>
+    <summary>А если он откажется?</summary>
+    <p>Ты можешь пользоваться и одна: тебе останутся ежедневный вопрос о том, что было тёплого, и картина ваших дней. Код пары подключается в любой момент позже.</p>
+  </details>
+
+  <details>
+    <summary>Это не манипуляция?</summary>
+    <p>Он с самого начала знает, что действия приходят из твоих ответов — это не секрет от него. Скрыты только формулировки, потому что дословный пересказ обычно ранит, а не помогает.</p>
+  </details>
+
+  <details>
+    <summary>Что с моими словами и данными?</summary>
+    <p>Всё хранится на серверах в России. Твой текст нужен только для того, чтобы собрать действия на день; он не показывается партнёру и не передаётся третьим лицам.</p>
+  </details>
+
+  <details>
+    <summary>Нужно что-то устанавливать?</summary>
+    <p>Нет, это обычная страница в браузере. При желании её можно добавить на главный экран телефона — тогда работает как приложение и приходят напоминания.</p>
+  </details>
+</section>
+
+<footer class="wrap">
+  <a href="/">Войти</a>
+  <a href="/privacy">Конфиденциальность</a>
+  <div class="foot-note">LoveTracker · lovetracker.ru</div>
+</footer>
+
+<script>
+/* ---- Сигнатурный переводчик: примеры ---- */
+var PAIRS = [
+  {
+    her: "Я устала быть той, кто всё помнит и всё тащит. Хочется хоть иногда просто выдохнуть.",
+    his: [
+      "Возьми на себя один вопрос целиком, не спрашивая деталей.",
+      "Скажи ей вечером, что сегодня ты держишь всё сам.",
+      "Дай ей час, когда её никто не трогает."
+    ]
+  },
+  {
+    her: "Мы вроде рядом, но каждый в телефоне. Уже не помню, когда последний раз просто разговаривали.",
+    his: [
+      "Двадцать минут вечером без телефонов — оба.",
+      "Спроси не про дела, а про то, как она себя чувствует.",
+      "Вспомни вслух что-то ваше из прошлого."
+    ]
+  },
+  {
+    her: "Хочется чувствовать, что меня замечают. Не подарки, а вот это — что видит.",
+    his: [
+      "Скажи вслух одну конкретную вещь, которая тебе в ней нравится.",
+      "Заметь что-то, что она сделала сегодня, и назови это.",
+      "Напиши ей днём просто так, без повода."
+    ]
+  }
+];
+
+var herEl = document.getElementById('her');
+var hisEl = document.getElementById('his');
+var dotsEl = document.getElementById('dots');
+var idx = 0, timer = null;
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderHis(list){
+  hisEl.innerHTML = list.map(function(t){
+    return '<div class="tr-task"><i>✦</i><div>' + t + '</div></div>';
+  }).join('');
+}
+
+function paint(i, animate){
+  var p = PAIRS[i];
+  function apply(){
+    herEl.textContent = p.her;
+    renderHis(p.his);
+    herEl.classList.remove('out');
+    hisEl.classList.remove('out');
+  }
+  Array.prototype.forEach.call(dotsEl.children, function(b, n){
+    b.setAttribute('aria-current', n === i ? 'true' : 'false');
+  });
+  if (animate && !reduced){
+    herEl.classList.add('out');
+    hisEl.classList.add('out');
+    setTimeout(apply, 320);
+  } else {
+    apply();
+  }
+}
+
+PAIRS.forEach(function(_, i){
+  var b = document.createElement('button');
+  b.setAttribute('role','tab');
+  b.setAttribute('aria-label','Пример ' + (i+1));
+  b.addEventListener('click', function(){ idx = i; paint(idx, true); restart(); });
+  dotsEl.appendChild(b);
+});
+
+function tick(){ idx = (idx + 1) % PAIRS.length; paint(idx, true); }
+function restart(){ if (timer) clearInterval(timer); if (!reduced) timer = setInterval(tick, 6500); }
+
+paint(0, false);
+restart();
+
+/* ---- Копирование приглашения ---- */
+var copyBtn = document.getElementById('copyBtn');
+copyBtn.addEventListener('click', function(){
+  var text = document.getElementById('inviteText').textContent.trim();
+  var done = function(){
+    document.getElementById('copied').style.display = 'block';
+    copyBtn.textContent = 'Готово ✓';
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } else { fallback(); }
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+});
+
+/* ---- Цель для Метрики: клик по главной кнопке ---- */
+document.getElementById('ctaMain').addEventListener('click', function(){
+  if (window.ym && window.YM_ID) ym(window.YM_ID, 'reachGoal', 'start_click');
+});
+</script>
+
+<!-- ============ ЯНДЕКС.МЕТРИКА ============
+     Вставь свой номер счётчика вместо 00000000 в ДВУХ местах ниже
+     и раскомментируй блок (убери строку с open-comment и close-comment).
+<script>
+window.YM_ID = 00000000;
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+ym(00000000,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
+</script>
+============================================ -->
+
+</body>
+</html>
