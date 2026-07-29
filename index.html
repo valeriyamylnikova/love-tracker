@@ -1740,13 +1740,13 @@ async function renderActivityFeed(allComps, todayComps){
   ]);
   const ql = (qlRaw||[]).sort((a,b)=>b.pct-a.pct);
   const todayPref = prefData?.language || null;
-  const doneIds=new Set(todayComps.map(c=>c.task_ref));
+  const doneIds=new Set(todayComps.map(c=>c.task_id));
   const genned=genTasks(todayPref,ql||[],remData||[]);
 
   if(!genned.length){feed.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Нет заданий на сегодня</div>';return}
 
   feed.innerHTML='<div style="padding:4px 0">'+genned.map(t=>{
-    const done=doneIds.has(t.id)||todayComps.some(c=>c.task_ref?.includes(t.category));
+    const done=doneIds.has(t.id)||todayComps.some(c=>c.task_id?.includes(t.category));
     return `<div class="act-item">
       <div class="act-ic">${done?'✅':'⬜'}</div>
       <div class="act-body">
@@ -2001,15 +2001,15 @@ async function saveTodayTasks(tasks, opts={}){
     ai_model: opts.model || lastAiModel || todayRec?.ai_model || '',
     source: opts.source || ''
   };
-  try{
-    if(todayRec?.id){
-      const {data} = await pb.update('daily_tasks', todayRec.id, payload);
-      if(data) todayRec = data;
-    } else {
-      const {data} = await pb.insert('daily_tasks', payload);
-      if(data) todayRec = data;
-    }
-  }catch(e){ console.error('Не удалось сохранить задания дня:', e); }
+  const {data, error} = todayRec?.id
+    ? await pb.update('daily_tasks', todayRec.id, payload)
+    : await pb.insert('daily_tasks', payload);
+  if(error){
+    console.error('daily_tasks НЕ СОХРАНЕНЫ:', error);
+    toast('⚠️ Задания не сохранились на сервер');
+    return;
+  }
+  todayRec = data;
 }
 
 // Стабильные id: привязаны к дате и номеру слота, а не ко времени генерации.
@@ -2056,7 +2056,9 @@ async function loadHusbandData(){
   // Баннер рисуется ниже, ПОСЛЕ генерации — чтобы показать переведённый контекст,
   // а не сырые слова жены (дословный текст ломает ощущение "это мой выбор")
 
-  const doneIds=new Set((todayC||[]).map(c=>c.task_ref));
+  const doneIds  = new Set((todayC||[]).map(c=>c.task_id).filter(Boolean));
+  const doneText = new Set((todayC||[]).map(c=>c.task_text).filter(Boolean));
+  const isDone   = t => doneIds.has(t.id) || doneText.has(t.t);
 
   // Время последнего выполнения — с сервера (localStorage телефон чистит)
   lastCompletionServer = (todayC||[]).reduce((mx,c)=>{
@@ -2081,12 +2083,12 @@ async function loadHusbandData(){
 
   if(saved && saved.tasks.length && !needsRegen){
     // Задания на сегодня уже есть — просто отмечаем выполненные
-    hTasks = saved.tasks.map(t=>({...t, done: doneIds.has(t.id)}));
+    hTasks = saved.tasks.map(t=>({...t, done: isDone(t)}));
 
   } else if(saved && saved.tasks.length && needsRegen){
     // Входные данные изменились: ВЫПОЛНЕННЫЕ остаются, меняем только невыполненные
-    const doneTasks = saved.tasks.filter(t => doneIds.has(t.id));
-    const freeSlots = saved.tasks.filter(t => !doneIds.has(t.id)).map(t => t.id);
+    const doneTasks = saved.tasks.filter(isDone);
+    const freeSlots = saved.tasks.filter(t => !isDone(t)).map(t => t.id);
     const needed = freeSlots.length;
 
     if(needed > 0){
@@ -2269,7 +2271,7 @@ async function completeTask(i){
   if(card){card.classList.add('completing')}
 
   // task_text/task_cat — чтобы жена видела реально выполненное задание, а не случайную заглушку
-  const {error:insErr}=await pb.insert('completions',{user_id:CU.id,task_ref:task.id,task_text:task.t,task_cat:task.category,couple_id:CP.couple_id,completed_at:new Date().toISOString()});
+  const {error:insErr}=await pb.insert('completions',{user_id:CU.id,task_id:task.id,task_text:task.t,task_cat:task.category,completed_at:new Date().toISOString()});
   if(insErr){
     // Ничего не сохранилось — откатываем UI и не начисляем очки
     if(btn){btn.disabled=false;btn.textContent='Отметить, что сделал ✓'}
