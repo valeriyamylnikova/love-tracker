@@ -173,8 +173,8 @@ footer a:hover{color:var(--text2)}
 <!-- ============ HERO + СИГНАТУРНЫЙ БЛОК ============ -->
 <header class="wrap hero">
   <div class="logo">LoveTracker</div>
-  <h1>Он не догадывается.<br>Не потому что <span class="accent">не любит</span>.</h1>
-  <p class="sub">Просто вы говорите на разных языках. Ты рассказываешь своими словами, что тебе сейчас важно — он получает три понятных ему шага на день.</p>
+  <h1>Он <span class="accent">любит</span> тебя.<br>Но живёт в мужской системе координат.</h1>
+  <p class="sub">Просто вы говорите на разных языках. Это приложение — ваш переводчик. Ты на своём телефоне рассказываешь, что тебе сейчас важно — а он на своём получает три понятных ему шага на день.</p>
 
   <div class="tr">
     <div class="tr-card">
@@ -390,7 +390,7 @@ restart();
 /* ---- Копирование приглашения ---- */
 var copyBtn = document.getElementById('copyBtn');
 copyBtn.addEventListener('click', function(){
-  var text = document.getElementById('inviteText').textContent.trim();
+  var text = document.getElementById('inviteText').textContent.trim() + '\n\nhttps://lovetracker.ru';
   var done = function(){
     document.getElementById('copied').style.display = 'block';
     copyBtn.textContent = 'Готово ✓';
